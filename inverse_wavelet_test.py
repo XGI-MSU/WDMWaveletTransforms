@@ -4,7 +4,7 @@ import numpy as np
 
 import pytest
 
-from inverse_wavelet_funcs import inverse_wavelet_freq,inverse_wavelet_freq_time
+from inverse_wavelet_freq_funcs import inverse_wavelet_freq,inverse_wavelet_freq_time
 from inverse_wavelet_time_funcs import inverse_wavelet_time
 from fft_funcs import irfft,rfft
 
