@@ -8,7 +8,7 @@ try:
 except ImportError:
     print('mkl fft not available trying numpy')
     import numpy
-    rfft = numpy.rfft
-    irfft = numpy.irfft
-    fft = numpy.fft
-    ifft = numpy.ifft
+    rfft = numpy.fft.rfft
+    irfft = numpy.fft.irfft
+    fft = numpy.fft.fft
+    ifft = numpy.fft.ifft

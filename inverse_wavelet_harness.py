@@ -33,13 +33,6 @@ if __name__=='__main__':
     alpha = 8*(2.0*(4.0*DT)/Tobs)
 
     wave_in = np.random.normal(0.,1.,(Nt,Nf))
-    #inverse_wavelet_freq(wave_in,Nf,Nt,dt)
-    #n_run = 10
-    #t0 = perf_counter()
-    #for itrm in range(0,n_run):
-    #    inverse_wavelet_freq(wave_in,Nf,Nt,dt)
-    #t1 = perf_counter()
-    #print('got freq domain inverse transform in %5.3fs'%((t1-t0)/n_run))
 
     inverse_wavelet_time(wave_in,Nf,Nt,dt,mult=32)
     #import sys
@@ -74,61 +67,6 @@ if __name__=='__main__':
     #sys.exit()
     wave_in2 = transform_wavelet_time(data,Nf,Nt,ts,mult=32)
     wave_in1 = transform_wavelet_freq(data_f,Nf,Nt,fs)
-    #wave_in1 = np.random.normal(0.,1.,(Nt,Nf))
-    #matchsigf_sigt = 1-np.sum((wave_in1*wave_in2))/np.sqrt(np.sum(wave_in2**2)*np.sum(wave_in1**2))
-    #assert np.allclose(wave_in1[:,1:],wave_in2[:,1:],atol=1.e-10,rtol=1.e-6)
-    #print('waveform match',matchsigf_sigt)
-    #wave_in2[:,:m] = 0.
-    #wave_in2[:,m+1] = 0.
-    #wave_in = wave_in1
-    #wave_in1[
-
-    #import matplotlib.pyplot as plt
-    #plt.plot(wave_in1[:,0])
-    #plt.plot(wave_in2[:,0])
-    ###plt.plot(wave_in2[:,0]-wave_in1[:,0])
-    ###plt.imshow(np.rot90(wave_in2-wave_in1),aspect='auto')
-    #plt.show()
-    #import sys
-    #sys.exit()
-    #data /= wave_in[1,9]
-    #wave_in1[:,m+1:] = 0.
-    #wave_in1[:,:m] = 0.
-    #wave_in1[1::2,m] = 0.
-    #wave_in1[::2,m] = np.sum(data**2)/(np.sqrt(Nf)*Nt)*2
-    #wave_in1[15:] = 0.
-    #wave_in1[:10] = 0.
-    #wave_in1[:,:Nf-1] = 0.
-    #wave_in1[::2,Nf-1] = 0.
-    #wave_in1[::2] = 0.
-    #wave_in1[::2,0] = 0.
-    #wave_in1[:,0] = 0.
-    #wave_in1[:,:5] = 0.
-    #wave_in1[:,10:] = 0.
-    #wave_in1[10:] = 0.
-    #wave_in[1::2] = 0.
-    #wave_in1[:,1::2] = 0.
-
-    #wave_in1[:,Nf-1:] = 0.
-    #wave_in1[:,0] = 0.
-    #wave_in1[::2,1] = 0.
-    #wave_in1[4:] = 0.
-    #wave_in1[::2,0] = 0.
-    #wave_in1[:,1::2] = 0.
-    #wave_in1[:,:7] = 0.
-    #wave_in1[:,1:] = 0.
-    #wave_in1[:31] = 0.
-
-    #wave_in1[:19] = 0.
-    #wave_in1[:31] = 0.
-    #wave_in1[:,1:] = 0.
-    #wave_in1[::2,0] = 0.
-    #wave_in1[1::2,0] = 8.#np.sum(data**2)/(np.sqrt(Nf)*Nt)*2
-
-    #wave_in2[:,m+1:] = 0.
-    #wave_in2[:,:m] = 0.
-    #wave_in2[::2,m] = 0.
-    #wave_in2[1::2,m] = -np.sum(data**2)/(np.sqrt(Nf)*Nt)*2
 
     #wave_in = np.loadtxt(file_in)
     t1 = perf_counter()
