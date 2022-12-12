@@ -4,11 +4,10 @@ import numpy as np
 
 import pytest
 
-from transform_time_funcs import transform_wavelet_time
-from transform_freq_funcs import transform_wavelet_freq,transform_wavelet_freq_time
+from wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
 from fft_funcs import rfft
 
-EXACT_MATCH = False
+EXACT_MATCH = True
 
 def test_inverse_wavelets():
     """test that forward wavelet transforms perform precisely as recorded in the input dat files
@@ -65,37 +64,41 @@ def test_inverse_wavelets():
     assert np.all(ts_in==ts)
     assert np.all(fs_in==fs)
 
-    wave_freq_got = transform_wavelet_freq(signal_freq_in,Nf,Nt,fs)
+    wave_freq_got = transform_wavelet_freq(signal_freq_in,Nf,Nt,dt)
 
     t0 = perf_counter()
-    wave_freq_got = transform_wavelet_freq(signal_freq_in,Nf,Nt,fs)
+    wave_freq_got = transform_wavelet_freq(signal_freq_in,Nf,Nt,dt)
     t1 = perf_counter()
 
     print('got frequency domain transform in %5.3fs'%(t1-t0))
 
 
-    wave_time_got = transform_wavelet_time(signal_time_in,Nf,Nt,ts,mult=32)
+    wave_time_got = transform_wavelet_time(signal_time_in,Nf,Nt,dt,mult=32)
 
     t0 = perf_counter()
-    wave_time_got = transform_wavelet_time(signal_time_in,Nf,Nt,ts,mult=32)
+    wave_time_got = transform_wavelet_time(signal_time_in,Nf,Nt,dt,mult=32)
     t1 = perf_counter()
     print('got time domain forward transform in %5.3fs'%(t1-t0))
 
-    wave_time_got2 = transform_wavelet_freq_time(signal_time_in,Nf,Nt,ts)
+    wave_time_got2 = transform_wavelet_freq_time(signal_time_in,Nf,Nt,dt)
 
     t0 = perf_counter()
-    wave_time_got2 = transform_wavelet_freq_time(signal_time_in,Nf,Nt,ts)
+    wave_time_got2 = transform_wavelet_freq_time(signal_time_in,Nf,Nt,dt)
     t1 = perf_counter()
 
     print('got from time domain to wavelet domain via fft in %5.3fs'%(t1-t0))
 
     #needed for internal consistency check of wave_time_got2
-    wave_time_got3 = transform_wavelet_freq(rfft(signal_time_in),Nf,Nt,fs)
+    wave_time_got3 = transform_wavelet_freq(rfft(signal_time_in),Nf,Nt,dt)
 
     if EXACT_MATCH:
         assert np.all(wave_freq_got==wave_freq_in)
         print('forward frequency domain transform matches expectation exactly')
-
+        print(wave_time_got[0,0])
+        print(wave_time_in[0,0])
+        print(wave_freq_got[0,0])
+        print(wave_time_got==wave_time_in)
+        print(np.sum(wave_time_got==wave_time_in))
         assert np.all(wave_time_got==wave_time_in)
         print('forward time domain transform matches expectation exactly')
     else:

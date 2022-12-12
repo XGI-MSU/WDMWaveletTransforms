@@ -19,4 +19,136 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 MA  02111-1307  USA
 
 =============Overview=============
-This module implements the fast forward and inverse WDM wavelet transforms in python
+This module implements the fast forward and inverse WDM wavelet transforms in python from both the time and frequency domains. 
+The frequency domain transforms are inherently much faster and more accurate. 
+The wavelet domain->frequency domain and frequency domain->wavelet domain transforms
+are nearly exact numerical inverses of each other with parameters similar to the test parameters used on gaussian random noise. 
+
+==========Data Structure==========
+Currently, we assume both Nt and Nf are even. If either is not even, the results may not be accurate, though they could be extended to general shapes in the future.
+Because the highest and lowest frequency bins each need only half the coefficients as the other bins, we can pack all the coefficients into 
+the bottom frequency pixel, and retain an Nt by Nf matrix, alternating the lowest and highest frequencies at even and odd time pixels. This packing is why we require the number of time pixels to be even.
+
+
+===========Running================
+We provide both command line and python interfaces to the code. The command line interfaces read and save results from .dat files.
+The 6 python interfaces to the code can be found in wavelet_transforms.py
+and are named: inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time,transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
+The interfaces are invoked as follows:
+
+Forward Transforms:
+
+frequency domain->wavelet domain via frequency domain transform:
+Python:
+signal_wavelet_out = transform_wavelet_freq(signal_freq_in,Nf,Nt,dt)
+Command line:
+python forward_wavelet_freq_harness.py filename_freq_in filename_wavelet_out dt Nt Nf
+
+time domain->wavelet domain via time domain transform:
+Python:
+signal_wavelet_out = transform_wavelet_time(signal_time_in,Nf,Nt,dt,mult=mult)
+Command line:
+python forward_wavelet_time_harness.py filename_time_in filename_out dt Nt Nf mult
+
+time domain->wavelet domain via fft and frequency domain transform
+Python:
+signal_wavelet_out = transform_wavelet_freq_time(signal_time_in,Nf,Nt,dt)
+Command line:
+python forward_wavelet_freq_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf
+
+Inverse Transforms:
+
+wavelet domain->frequency domain via frequency domain transform:
+Python:
+signal_freq_out = inverse_wavelet_freq(signal_wavelet_in,Nf,Nt,dt)
+Command line:
+python inverse_wavelet_freq_harness.py filename_wavelet_in filename_freq_out dt
+
+wavelet domain->time domain via time domain transform:
+Python:
+signal_time_out = inverse_wavelet_time(signal_wavelet_in,Nf,Nt,dt,mult=mult)
+Command line:
+python inverse_wavelet_time_harness.py filename_wavelet_in filename_time_out dt mult
+
+wavelet domain->time domain via frequency domain transform and fft:
+Python:
+signal_time_out = inverse_wavelet_freq_time(signal_wavelet_in,Nf,Nt,dt)
+Command line:
+python inverse_wavelet_freq_time_harness.py filename_wavelet_in filename_time_out dt
+
+
+===============Timing===============
+
+The fast transforms are quite efficient. On a single core of an AMD Ryzen Threadripper 3970X
+with the MKL FFT libraries installed, a version of time_tests.py with approximately 8 years 
+of gaussian random noise data sampled at 5s intervals gives the following timings:
+
+dt = 5.0 Nt = 12288 Nf = 4096 mult = 16
+begin loading data files
+generated data in              4.2397728s
+got time->freq in              0.2338865s    1.0000000 X fft time
+got freq->time in              0.2127792s    0.9097540 X fft time
+got wavelet->freq in           3.2477098s   13.8858352 X fft time
+got wavelet->time in           5.5590221s   23.7680302 X fft time
+got wavelet->freq->time in     3.6975480s   15.8091531 X fft time
+got freq->wavelet in           1.6941847s    7.2436183 X fft time
+got time->wavelet in          15.2326701s   65.1284624 X fft time
+got time->freq->wavelet in     2.1416471s    9.1567782 X fft time
+
+The timing results will depend heavily on the fft library used. 
+Currently, fft_funcs.py supports either numpy or mkl-fft fft libraries. In our testing, mkl-fft is consistently faster.
+For example, here is a comparison of a run on a single core of the same machine with 6 months of data at 30s intervals with numpy fft:
+
+mkl fft not available trying numpy
+dt = 30.0 Nt = 512 Nf = 1024 mult = 16
+begin loading data files
+generated data in              0.6920439s
+got time->freq in              0.0095489s    1.0000000 X fft time
+got freq->time in              0.0112231s    1.1753315 X fft time
+got wavelet->freq in           0.0182579s    1.9120501 X fft time
+got wavelet->time in           0.0586002s    6.1368782 X fft time
+got wavelet->freq->time in     0.0329091s    3.4463912 X fft time
+got freq->wavelet in           0.0187142s    1.9598336 X fft time
+got time->wavelet in           0.2210319s   23.1474656 X fft time
+got time->freq->wavelet in     0.0257588s    2.6975836 X fft time
+
+vs with mkl fft:
+
+dt = 30.0 Nt = 512 Nf = 1024 mult = 16
+begin loading data files
+generated data in              0.5529449s
+got time->freq in              0.0011396s    1.0000000 X fft time
+got freq->time in              0.0013177s    1.1563102 X fft time
+got wavelet->freq in           0.0086046s    7.5505823 X fft time
+got wavelet->time in           0.0286762s   25.1634493 X fft time
+got wavelet->freq->time in     0.0191764s   16.8273333 X fft time
+got freq->wavelet in           0.0093265s    8.1840517 X fft time
+got time->wavelet in           0.1526154s  133.9205840 X fft time
+got time->freq->wavelet in     0.0153940s   13.5082907 X fft time
+
+all of the transforms are faster with mkl fft, though the improvement does not scale linearly with the time a single fft of the full dataset takes.
+The different timings will be highly architecture dependent. 
+Note that with mult=16, the wavelet->time and time->wavelet transform are approximate, 
+yet the time->freq->wavelet transform is approximately an order of magnitude faster than the time->wavelet transform, with a similar but smaller
+improvement in the wavelet->freq->time vs wavelet->time transform. 
+To achieve the same accuracy as the wavelet->freq and freq->wavelet transforms, we would need to set mult=Nt/2 (256 in this case),
+in which case we would get timings:
+
+dt = 30.0 Nt = 512 Nf = 1024 mult = 256
+begin loading data files
+generated data in              0.6983505s
+got time->freq in              0.0011767s    1.0000000 X fft time
+got freq->time in              0.0015124s    1.2853283 X fft time
+got wavelet->freq in           0.0114840s    9.7597607 X fft time
+got wavelet->time in           0.5447834s  462.9863181 X fft time
+got wavelet->freq->time in     0.0165543s   14.0687378 X fft time
+got freq->wavelet in           0.0127060s   10.7982746 X fft time
+got time->wavelet in           2.4145518s 2052.0162917 X fft time
+got time->freq->wavelet in     0.0167831s   14.2631639 X fft time
+
+which is approximately two orders of magnitude  slower for the wavelet->time and time->wavelet transforms compared to using an fft.
+The remaing transform timings differ only due to random timing variation.
+Therefore, for many use cases it is likely preferable to use the time->freq->wavelet and wavelet->freq->time versions of the transforms.
+
+Although numba's just-in-time compilation must occur at runtime, all of the modules compile reasonably fast 
+and compilation time is likely not a significant limiting factor for most applications

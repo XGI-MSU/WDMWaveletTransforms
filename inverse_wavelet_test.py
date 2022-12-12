@@ -4,12 +4,11 @@ import numpy as np
 
 import pytest
 
-from inverse_wavelet_freq_funcs import inverse_wavelet_freq,inverse_wavelet_freq_time
-from inverse_wavelet_time_funcs import inverse_wavelet_time
+from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time
 from fft_funcs import irfft,rfft
 
 #whether to expect exact match for input files
-EXACT_MATCH = False
+EXACT_MATCH = True
 
 def test_inverse_wavelets():
     """test that inverse wavelet transforms perform precisely as recorded in the input dat files

@@ -3,25 +3,6 @@ from numba import njit
 import numpy as np
 import fft_funcs as fft
 
-from transform_freq_funcs import phitilde_vec
-
-def inverse_wavelet_freq_time(wave_in,Nf,Nt,dt,nx=4.):
-    """inverse wavlet transform to time domain via fourier transform of frequency domain"""
-    res_f = inverse_wavelet_freq(wave_in,Nf,Nt,dt,nx)
-    return fft.irfft(res_f)
-
-def inverse_wavelet_freq(wave_in,Nf,Nt,dt,nx=4.):
-    """inverse wavelet transform to freq domain signal"""
-    ND = Nf*Nt
-    Tobs = ND*dt
-    oms = 2*np.pi/Tobs*np.arange(0,Nt//2+1)
-    phif = phitilde_vec(oms,Nf,dt,nx)
-    #nrm should be 1
-    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/Tobs)#np.linalg.n
-    nrm /= np.pi**(3/2)/np.pi/np.sqrt(dt) #normalization is ad hoc but appears correct
-    phif /= nrm
-    return inverse_wavelet_freq_helper_fast(wave_in,phif,Nf,Nt)
-
 #@njit()
 def inverse_wavelet_freq_helper_fast(wave_in,phif,Nf,Nt):
     """jit compatible loop for inverse_wavelet_freq"""

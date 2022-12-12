@@ -2,7 +2,6 @@
 import numpy as np
 from numba import njit
 import scipy.special
-import fft_funcs as fft
 
 def phitilde_vec(om,Nf,dt,nx=4.):
     """compute phitilde, om i array, nx is filter steepness, defaults to 4."""
@@ -79,48 +78,3 @@ def DX_unpack_loop(m,Nt,Nf,DX_trans,wave):
                     wave[n,m] = np.imag(DX_trans[n])
                 else:
                     wave[n,m] = np.real(DX_trans[n])
-
-
-def transform_wavelet_freq_time(data,Nf,Nt,ts,nx=4.):
-    """transform time domain data into wavelet domain via fft and then frequency transform"""
-    dt = ts[1]-ts[0]
-    ND = ts.size
-    Nt = ND//Nf
-    Tobs = dt*ND
-
-    data_fft = fft.rfft(data)
-    fs = np.arange(0.,ND//2+1)/Tobs
-    return transform_wavelet_freq(data_fft,Nf,Nt,fs,nx)
-
-def transform_wavelet_freq(data,Nf,Nt,fs,nx=4.):
-    """do the wavelet transform using the fast wavelet domain transform"""
-    ND = Nf*Nt
-    Tobs = 1.0/fs[1]
-    dt = Tobs/ND
-
-    dom = 2*np.pi/Tobs  # max frequency is K/2*dom = pi/dt = OM
-
-    half_Nt = np.int64(Nt/2)
-    phif = phitilde_vec(dom*np.arange(0,half_Nt+1),Nf,dt,nx)
-    if phif[-1]!=0.:
-        raise ValueError('filter is likely not large enough to normalize correctly')
-
-
-    nrm = 0.0
-    for l in range(-half_Nt,half_Nt+1):
-        nrm += phif[abs(l)]**2
-
-    nrm = np.sqrt(nrm/2.0)
-    nrm *= np.sqrt(Nt*Nf)
-
-    phif /= nrm
-
-
-    wave = np.zeros((Nt,Nf)) # wavelet wavepacket transform of the signal
-
-    DX = np.zeros(Nt,dtype=np.complex128)
-    for m in range(0,Nf+1):
-        DX_assign_loop(m,Nt,ND,DX,data,phif)
-        DX_trans = Nt*fft.ifft(DX,Nt)
-        DX_unpack_loop(m,Nt,Nf,DX_trans,wave)
-    return wave

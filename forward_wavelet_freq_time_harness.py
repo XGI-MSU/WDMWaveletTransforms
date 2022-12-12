@@ -5,11 +5,11 @@ import sys
 from time import perf_counter
 import numpy as np
 
-from transform_freq_funcs import transform_wavelet_freq_time
+from wavelet_transforms import transform_wavelet_freq_time
 
 if __name__=='__main__':
     if len(sys.argv)!=6:
-        print("transform_time.py filename_in filename_freq_out dt Nt Nf")
+        print("forward_wavelet_freq_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf")
         sys.exit(1)
 
     #transform parameters
@@ -36,7 +36,7 @@ if __name__=='__main__':
     assert np.all(ts==ts_in)
 
     t0 = perf_counter()
-    wave_time = transform_wavelet_freq_time(signal_time,Nf,Nt,ts)
+    wave_time = transform_wavelet_freq_time(signal_time,Nf,Nt,dt)
     t1 = perf_counter()
 
     print('got time domain transform in %5.3fs'%(t1-t0))

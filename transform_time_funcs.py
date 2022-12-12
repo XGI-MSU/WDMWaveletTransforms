@@ -67,27 +67,25 @@ def phi_vec(Nf,dt,nx=4.,mult=16):
     return phi
 
 
-def transform_wavelet_time(data,Nf,Nt,ts,nx=4.,mult=32):
-    """do the wavelet transform in the time domain"""
-    # the time domain data stream
-    ND = ts.size
-
-    dt = ts[1]-ts[0]
-
-    #mult, can cause bad leakage if it is too small but may be possible to mitigate
-    #mult = 16 # Filter is mult times pixel with in time
-
-    K = mult*2*Nf
-
-    # windowed data packets
-    wdata = np.zeros(K)
-
-    wave = np.zeros((Nt,Nf))  # wavelet wavepacket transform of the signal
-    phi = phi_vec(Nf,dt,nx,mult)
-
-    for i in range(0,Nt):
-        assign_wdata(i,K,ND,Nf,wdata,data,phi)
-        wdata_trans = fft.rfft(wdata,K)
-        pack_wave(i,mult,Nf,wdata_trans,wave)
-
-    return wave
+#def transform_wavelet_time(data,Nf,Nt,dt,nx=4.,mult=32):
+#    """do the wavelet transform in the time domain"""
+#    # the time domain data stream
+#    ND = Nf*Nt
+#
+#    #mult, can cause bad leakage if it is too small but may be possible to mitigate
+#    #mult = 16 # Filter is mult times pixel with in time
+#
+#    K = mult*2*Nf
+#
+#    # windowed data packets
+#    wdata = np.zeros(K)
+#
+#    wave = np.zeros((Nt,Nf))  # wavelet wavepacket transform of the signal
+#    phi = phi_vec(Nf,dt,nx,mult)
+#
+#    for i in range(0,Nt):
+#        assign_wdata(i,K,ND,Nf,wdata,data,phi)
+#        wdata_trans = fft.rfft(wdata,K)
+#        pack_wave(i,mult,Nf,wdata_trans,wave)
+#
+#    return wave

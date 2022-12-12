@@ -4,12 +4,12 @@ import sys
 from time import perf_counter
 import numpy as np
 
-from inverse_wavelet_time_funcs import inverse_wavelet_time
+from wavelet_transforms import inverse_wavelet_time
 
 if __name__=='__main__':
     #assume input .dat file is Nt rows by Nf columns
     if len(sys.argv)!=5:
-        print("transform_time.py filename_in filename_time_out dt mult")
+        print("inverse_wavelet_time_harness.py filename_wavelet_in filename_time_out dt mult")
         sys.exit(1)
 
     file_in = sys.argv[1]
