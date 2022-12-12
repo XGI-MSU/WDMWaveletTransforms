@@ -7,7 +7,7 @@ import pytest
 from wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
 from fft_funcs import rfft
 
-EXACT_MATCH = True
+EXACT_MATCH = False
 
 def test_inverse_wavelets():
     """test that forward wavelet transforms perform precisely as recorded in the input dat files

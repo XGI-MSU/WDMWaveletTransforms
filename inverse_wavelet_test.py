@@ -8,7 +8,7 @@ from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,in
 from fft_funcs import irfft,rfft
 
 #whether to expect exact match for input files
-EXACT_MATCH = True
+EXACT_MATCH = False
 
 def test_inverse_wavelets():
     """test that inverse wavelet transforms perform precisely as recorded in the input dat files
