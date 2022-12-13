@@ -3,6 +3,18 @@ import numpy as np
 from numba import njit
 import scipy.special
 
+def phitilde_vec_norm(Nf,Nt,dt,nx):
+    """helper function to get phitilde vec normalized as needed"""
+    ND = Nf*Nt
+    Tobs = ND*dt
+    oms = 2*np.pi/Tobs*np.arange(0,Nt//2+1)
+    phif = phitilde_vec(oms,Nf,dt,nx)
+    #nrm should be 1
+    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/Tobs)#np.linalg.n
+    nrm /= np.pi**(3/2)/np.pi/np.sqrt(dt) #normalization is ad hoc but appears correct
+    phif /= nrm
+    return phif
+
 def phitilde_vec(om,Nf,dt,nx=4.):
     """compute phitilde, om i array, nx is filter steepness, defaults to 4."""
     OM = np.pi/dt  #Nyquist angular frequency

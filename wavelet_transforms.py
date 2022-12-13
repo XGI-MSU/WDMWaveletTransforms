@@ -1,6 +1,6 @@
 """helper functions for transform_time.py"""
 import numpy as np
-from transform_freq_funcs import phitilde_vec,DX_assign_loop,DX_unpack_loop
+from transform_freq_funcs import phitilde_vec_norm,DX_assign_loop,DX_unpack_loop
 from inverse_wavelet_freq_funcs import inverse_wavelet_freq_helper_fast
 from inverse_wavelet_time_funcs import inverse_wavelet_time_helper_fast
 import fft_funcs as fft
@@ -11,39 +11,9 @@ def inverse_wavelet_time(wave_in,Nf,Nt,dt,nx=4.,mult=32):
     ND = Nf*Nt
 
     mult = min(mult,ND//(2*Nf)) #make sure K isn't bigger than ND
+    K = mult*2*Nf
 
-    OM = np.pi/dt
-    M = Nf
-    DOM = OM/M
-    insDOM = 1./np.sqrt(DOM)
-    K = mult*2*M
-    half_K = np.int64(K/2)
-
-    Tw = dt*K
-
-    dom = 2*np.pi/Tw  # max frequency is K/2*dom = pi/dt = OM
-
-    #zero frequency
-    DX = np.zeros(K,dtype=np.complex128)
-    DX[0] =  insDOM
-
-    DX = DX.copy()
-    # postive frequencies
-    DX[1:half_K+1] = phitilde_vec(dom*np.arange(1,half_K+1),Nf,dt,nx)
-    # negative frequencies
-    DX[half_K+1:] = phitilde_vec(-dom*np.arange(half_K-1,0,-1),Nf,dt,nx)
-
-    DX = K*fft.ifft(DX,K)
-
-    phi = np.zeros(K)
-    phi[0:half_K] = np.real(DX[half_K:K])
-    phi[half_K:] = np.real(DX[0:half_K])
-
-    nrm = np.sqrt(K/dom)
-
-    # windowed data packets
-    fac = np.sqrt(2.0)/nrm
-    phi *= fac
+    phi = phi_vec(Nf,dt,nx,mult)
 
     return inverse_wavelet_time_helper_fast(wave_in,phi,Nf,Nt,K)
 
@@ -54,14 +24,7 @@ def inverse_wavelet_freq_time(wave_in,Nf,Nt,dt,nx=4.):
 
 def inverse_wavelet_freq(wave_in,Nf,Nt,dt,nx=4.):
     """inverse wavelet transform to freq domain signal"""
-    ND = Nf*Nt
-    Tobs = ND*dt
-    oms = 2*np.pi/Tobs*np.arange(0,Nt//2+1)
-    phif = phitilde_vec(oms,Nf,dt,nx)
-    #nrm should be 1
-    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/Tobs)#np.linalg.n
-    nrm /= np.pi**(3/2)/np.pi/np.sqrt(dt) #normalization is ad hoc but appears correct
-    phif /= nrm
+    phif = phitilde_vec_norm(Nf,Nt,dt,nx)
     return inverse_wavelet_freq_helper_fast(wave_in,phif,Nf,Nt)
 
 def transform_wavelet_time(data,Nf,Nt,dt,nx=4.,mult=32):
@@ -96,33 +59,33 @@ def transform_wavelet_freq_time(data,Nf,Nt,dt,nx=4.):
 def transform_wavelet_freq(data,Nf,Nt,dt,nx=4.):
     """do the wavelet transform using the fast wavelet domain transform"""
     ND = Nf*Nt
-    Tobs = dt*ND
-    #Tobs = 1.0/fs[1]
-    #dt = Tobs/ND
+#    Tobs = dt*ND
+#
+#    dom = 2*np.pi/Tobs  # max frequency is K/2*dom = pi/dt = OM
+#
+#    half_Nt = np.int64(Nt/2)
+#    phif = phitilde_vec(dom*np.arange(0,half_Nt+1),Nf,dt,nx)
+#    if phif[-1]!=0.:
+#        raise ValueError('filter is likely not large enough to normalize correctly')
+#
+#
+#    nrm = 0.0
+#    for l in range(-half_Nt,half_Nt+1):
+#        nrm += phif[abs(l)]**2
+#
+#    nrm = np.sqrt(nrm/2.0)
+#    nrm *= np.sqrt(Nt*Nf)
+#
+#    phif /= nrm
+#    phif *= Nt
 
-    dom = 2*np.pi/Tobs  # max frequency is K/2*dom = pi/dt = OM
-
-    half_Nt = np.int64(Nt/2)
-    phif = phitilde_vec(dom*np.arange(0,half_Nt+1),Nf,dt,nx)
-    if phif[-1]!=0.:
-        raise ValueError('filter is likely not large enough to normalize correctly')
-
-
-    nrm = 0.0
-    for l in range(-half_Nt,half_Nt+1):
-        nrm += phif[abs(l)]**2
-
-    nrm = np.sqrt(nrm/2.0)
-    nrm *= np.sqrt(Nt*Nf)
-
-    phif /= nrm
-
+    phif = 2/Nf*phitilde_vec_norm(Nf,Nt,dt,nx)
 
     wave = np.zeros((Nt,Nf)) # wavelet wavepacket transform of the signal
 
     DX = np.zeros(Nt,dtype=np.complex128)
     for m in range(0,Nf+1):
         DX_assign_loop(m,Nt,ND,DX,data,phif)
-        DX_trans = Nt*fft.ifft(DX,Nt)
+        DX_trans = fft.ifft(DX,Nt)
         DX_unpack_loop(m,Nt,Nf,DX_trans,wave)
     return wave
