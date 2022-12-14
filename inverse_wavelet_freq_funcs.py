@@ -22,19 +22,52 @@ def inverse_wavelet_freq_helper_fast(wave_in,phif,Nf,Nt):
 @njit()
 def unpack_wave_inverse(m,Nt,Nf,phif,fft_prefactor2s,res):
     """helper for unpacking results of frequency domain inverse transform"""
-    ND = Nt*Nf
-    i_min2 = min(max(Nt//2*(m-1),0),ND//2+1)
-    i_max2 = min(max(Nt//2*(m+1),0),ND//2+1)
-    for i in range(i_min2,i_max2):
-        i_ind = np.abs(i-Nt//2*m)
-        if i_ind>Nt//2:
-            continue
-        if m==0:
-            res[i] += fft_prefactor2s[(2*i)%Nt]*phif[i_ind]
-        elif m==Nf:
-            res[i] += fft_prefactor2s[(2*i)%Nt]*phif[i_ind]
-        else:
-            res[i] += fft_prefactor2s[i%Nt]*phif[i_ind]
+
+    if m==0 or m==Nf:
+        for i_ind in range(0,Nt//2):
+            i = np.abs(m*Nt//2-i_ind)#i_off+i_min2
+            ind3 = (2*i)%Nt
+            res[i] += fft_prefactor2s[ind3]*phif[i_ind]
+        if m==Nf:
+            i_ind = Nt//2
+            i = np.abs(m*Nt//2-i_ind)#i_off+i_min2
+            ind3 = 0
+            res[i] += fft_prefactor2s[ind3]*phif[i_ind]
+    else:
+        ind31 = (Nt//2*m)%Nt
+        ind32 = (Nt//2*m)%Nt
+        for i_ind in range(0,Nt//2):
+            i1 = Nt//2*m-i_ind
+            i2 = Nt//2*m+i_ind
+            #assert ind31 == i1%Nt
+            #assert ind32 == i2%Nt
+            res[i1] += fft_prefactor2s[ind31]*phif[i_ind]
+            res[i2] += fft_prefactor2s[ind32]*phif[i_ind]
+            ind31 -= 1
+            ind32 += 1
+            if ind31<0:
+                ind31 = Nt-1
+            if ind32==Nt:
+                ind32 = 0
+
+        res[Nt//2*m] = fft_prefactor2s[(Nt//2*m)%Nt]*phif[0]
+
+#@njit()
+#def unpack_wave_inverse(m,Nt,Nf,phif,fft_prefactor2s,res):
+#    """helper for unpacking results of frequency domain inverse transform"""
+#    ND = Nt*Nf
+#    i_min2 = min(max(Nt//2*(m-1),0),ND//2+1)
+#    i_max2 = min(max(Nt//2*(m+1),0),ND//2+1)
+#    for i in range(i_min2,i_max2):
+#        i_ind = np.abs(i-Nt//2*m)
+#        if i_ind>Nt//2:
+#            continue
+#        if m==0:
+#            res[i] += fft_prefactor2s[(2*i)%Nt]*phif[i_ind]
+#        elif m==Nf:
+#            res[i] += fft_prefactor2s[(2*i)%Nt]*phif[i_ind]
+#        else:
+#            res[i] += fft_prefactor2s[i%Nt]*phif[i_ind]
 
 @njit()
 def pack_wave_inverse(m,Nt,Nf,prefactor2s,wave_in):

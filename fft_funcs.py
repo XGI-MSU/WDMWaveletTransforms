@@ -1,7 +1,7 @@
 """helper to make sure available fft functions are consistent across modules depending on install
-mkl-fft is faster so it is the default, but numpy fft is probably more commonly installed to it is the fallback
-fftw might be even faster, but it might also be less flexible so we do not implement it currently"""
+mkl-fft is faster so it is the default, but numpy fft is probably more commonly installed to it is the fallback"""
 try:
+    print('using mkl fft')
     import mkl_fft
     rfft = mkl_fft.rfft_numpy
     irfft = mkl_fft.irfft_numpy

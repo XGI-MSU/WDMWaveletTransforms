@@ -36,7 +36,7 @@ if __name__=='__main__':
     assert np.all(fs==fs_in)
 
     t0 = perf_counter()
-    wave_freq = transform_wavelet_freq(signal_freq,Nf,Nt,dt)
+    wave_freq = transform_wavelet_freq(signal_freq,Nf,Nt)
     t1 = perf_counter()
 
     print('got frequency domain transform in %5.3fs'%(t1-t0))

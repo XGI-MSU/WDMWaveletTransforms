@@ -32,7 +32,7 @@ if __name__=='__main__':
     ts = np.arange(0,ND)*dt
 
     t0 = perf_counter()
-    signal_time = inverse_wavelet_freq_time(wave_in,Nf,Nt,dt)
+    signal_time = inverse_wavelet_freq_time(wave_in,Nf,Nt)
     t1 = perf_counter()
 
     print('got time domain transform via freq in %5.3fs'%(t1-t0))

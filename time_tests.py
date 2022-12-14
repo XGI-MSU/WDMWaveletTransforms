@@ -3,11 +3,11 @@ from time import perf_counter
 import numpy as np
 
 from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time,transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
-from fft_funcs import irfft,rfft
+import fft_funcs as fft
 
 if __name__=='__main__':
     #transform parameters
-    dt = 30.
+    dt = 5.
     Nt = 512
     Nf = 1024
     mult = 16
@@ -26,33 +26,31 @@ if __name__=='__main__':
 
     #the initial data
     signal_time = np.random.normal(0.,1.,ND)
-    signal_freq = rfft(signal_time)
+    signal_freq = fft.rfft(signal_time)
     wave_in = transform_wavelet_freq(signal_freq,Nf,Nt,dt)
 
     t1 = perf_counter()
 
     print('generated data in             %10.7fs'%(t1-t0))
 
-    rfft(signal_time)
+    fft.rfft(signal_time)
 
     n_run = 1000
     t6 = perf_counter()
     for itrm in range(n_run):
-        rfft(signal_time)
+        fft.rfft(signal_time)
     t7 = perf_counter()
 
     time_scale = (t7-t6)/n_run
 
     print('got time->freq in             %10.7fs %12.7f X fft time'%((t7-t6)/n_run,(t7-t6)/n_run/time_scale))
 
-    inverse_wavelet_freq(wave_in,Nf,Nt,dt)
-
-    irfft(signal_freq)
+    fft.irfft(signal_freq)
 
     n_run = 1000
     t2 = perf_counter()
     for itrm in range(n_run):
-        irfft(signal_freq)
+        fft.irfft(signal_freq)
     t3 = perf_counter()
 
     print('got freq->time in             %10.7fs %12.7f X fft time'%((t3-t2)/n_run,(t3-t2)/n_run/time_scale))

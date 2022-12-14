@@ -72,9 +72,9 @@ def test_harness_writes():
         assert np.all(fw_in==fw_out)
         assert np.all(tw_in==tw_out)
     else:
-        assert np.allclose(f_inr,f_outr,atol=1.e-13,rtol=1.e-13)
-        assert np.allclose(f_ini,f_outi,atol=1.e-13,rtol=1.e-13)
-        assert np.allclose(f_in,f_out,atol=1.e-13,rtol=1.e-13)
+        assert np.allclose(f_inr,f_outr,atol=1.e-12,rtol=1.e-12)
+        assert np.allclose(f_ini,f_outi,atol=1.e-12,rtol=1.e-12)
+        assert np.allclose(f_in,f_out,atol=1.e-12,rtol=1.e-12)
         assert np.allclose(t_out1,t_in,atol=1.e-13,rtol=1.e-13)
         assert np.allclose(fw_in,fw_out,atol=1.e-13,rtol=1.e-13)
         assert np.allclose(tw_in,tw_out,atol=1.e-13,rtol=1.e-13)

@@ -36,7 +36,7 @@ if __name__=='__main__':
     assert np.all(ts==ts_in)
 
     t0 = perf_counter()
-    wave_time = transform_wavelet_freq_time(signal_time,Nf,Nt,dt)
+    wave_time = transform_wavelet_freq_time(signal_time,Nf,Nt)
     t1 = perf_counter()
 
     print('got time domain transform in %5.3fs'%(t1-t0))

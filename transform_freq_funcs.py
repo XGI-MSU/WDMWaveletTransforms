@@ -2,22 +2,12 @@
 import numpy as np
 from numba import njit
 import scipy.special
+import fft_funcs as fft
 
-def phitilde_vec_norm(Nf,Nt,dt,nx):
-    """helper function to get phitilde vec normalized as needed"""
-    ND = Nf*Nt
-    Tobs = ND*dt
-    oms = 2*np.pi/Tobs*np.arange(0,Nt//2+1)
-    phif = phitilde_vec(oms,Nf,dt,nx)
-    #nrm should be 1
-    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/Tobs)#np.linalg.n
-    nrm /= np.pi**(3/2)/np.pi/np.sqrt(dt) #normalization is ad hoc but appears correct
-    phif /= nrm
-    return phif
 
-def phitilde_vec(om,Nf,dt,nx=4.):
+def phitilde_vec(om,Nf,nx=4.):
     """compute phitilde, om i array, nx is filter steepness, defaults to 4."""
-    OM = np.pi/dt  #Nyquist angular frequency
+    OM = np.pi  #Nyquist angular frequency
     DOM = OM/Nf #2 pi times DF
     insDOM = 1./np.sqrt(DOM)
     B = OM/(2*Nf)
@@ -32,6 +22,17 @@ def phitilde_vec(om,Nf,dt,nx=4.):
 
     z[np.abs(om)<A] = insDOM
     return z
+
+def phitilde_vec_norm(Nf,Nt,nx):
+    """normalize phitilde as needed for inverse frequency domain transform"""
+    ND = Nf*Nt
+    oms = 2*np.pi/ND*np.arange(0,Nt//2+1)
+    phif = phitilde_vec(oms,Nf,nx)
+    #nrm should be 1
+    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/ND)
+    nrm /= np.pi**(3/2)/np.pi
+    phif /= nrm
+    return phif
 
 @njit()
 def tukey(data,alpha,N):
@@ -48,25 +49,43 @@ def tukey(data,alpha,N):
             f_mult = 0.5*(1.+np.cos(np.pi/Nwin*(i-imax)))
         data[i] *= f_mult
 
-@njit()
-def DX_assign_loop(m,Nt,ND,DX,data,phif):
-    """helper for assigning DX in the main loop"""
-    half_Nt = np.int64(Nt/2)
-    half_ND = np.int64(ND/2)
-    for j in range(-half_Nt,half_Nt):
-        i = j+half_Nt
-        jj = j+m*half_Nt
+def transform_wavelet_freq_helper(data,Nf,Nt,phif):
+    """helper to do the wavelet transform using the fast wavelet domain transform"""
+    wave = np.zeros((Nt,Nf)) # wavelet wavepacket transform of the signal
 
-        if 0<jj<half_ND:
-            DX[i] = phif[abs(j)]*data[jj]
-        elif jj==0:
-            #NOTE this term appears to be needed to recover correct constant (at least for m=0), but was previously missing
-            DX[i] = phif[abs(j)]*data[jj]/2.
-        elif jj==half_ND:
-            #NOTE this term appears to be needed to recover correct value (at least for m=Nf), but was previously missing
-            DX[i] = phif[abs(j)]*data[jj]/2.
-        else:
+    DX = np.zeros(Nt,dtype=np.complex128)
+    for m in range(0,Nf+1):
+        DX_assign_loop(m,Nt,Nf,DX,data,phif)
+        DX_trans = fft.ifft(DX,Nt)
+        DX_unpack_loop(m,Nt,Nf,DX_trans,wave)
+    return wave
+
+
+@njit()
+def DX_assign_loop(m,Nt,Nf,DX,data,phif):
+    """helper for assigning DX in the main loop"""
+    i_base = Nt//2
+    jj_base = m*Nt//2
+
+    if m==0 or m==Nf:
+        #NOTE this term appears to be needed to recover correct constant (at least for m=0), but was previously missing
+        DX[Nt//2] = phif[0]*data[m*Nt//2]/2.
+        DX[Nt//2] = phif[0]*data[m*Nt//2]/2.
+    else:
+        DX[Nt//2] = phif[0]*data[m*Nt//2]
+        DX[Nt//2] = phif[0]*data[m*Nt//2]
+
+    for jj in range(jj_base+1-Nt//2,jj_base+Nt//2):
+        j = np.abs(jj-jj_base)
+        i = i_base-jj_base+jj
+        if m==Nf and jj>jj_base:
             DX[i] = 0.
+        elif m==0 and jj<jj_base:
+            DX[i] = 0.
+        elif j==0:
+            continue
+        else:
+            DX[i] = phif[j]*data[jj]
 
 @njit()
 def DX_unpack_loop(m,Nt,Nf,DX_trans,wave):

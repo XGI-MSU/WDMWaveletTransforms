@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time
-from fft_funcs import irfft,rfft
+import fft_funcs as fft
 
 #whether to expect exact match for input files
 EXACT_MATCH = False
@@ -50,10 +50,10 @@ def test_inverse_wavelets():
     assert np.all(fs_in==fs)
 
 
-    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt,dt)
+    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt)
 
     t0 = perf_counter()
-    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt,dt)
+    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt)
     t1 = perf_counter()
 
     print('got frequency domain transform in %5.3fs'%(t1-t0))
@@ -61,31 +61,31 @@ def test_inverse_wavelets():
 
 
     t2 = perf_counter()
-    signal_time_trans = irfft(signal_freq)
+    signal_time_trans = fft.irfft(signal_freq)
     t3 = perf_counter()
 
     print('got inverse fourier transform in %5.3fs'%(t3-t2))
 
 
-    signal_time = inverse_wavelet_time(wave_in,Nf,Nt,dt,mult=32)
+    signal_time = inverse_wavelet_time(wave_in,Nf,Nt,mult=32)
 
     t4 = perf_counter()
-    signal_time = inverse_wavelet_time(wave_in,Nf,Nt,dt,mult=32)
+    signal_time = inverse_wavelet_time(wave_in,Nf,Nt,mult=32)
     t5 = perf_counter()
 
     print('got time domain transform in %5.3fs'%(t5-t4))
 
 
     t6 = perf_counter()
-    signal_freq_trans = rfft(signal_time)
+    signal_freq_trans = fft.rfft(signal_time)
     t7 = perf_counter()
 
     print('got forward fourier transform in %5.3fs'%(t7-t6))
 
-    signal_time2 = inverse_wavelet_freq_time(wave_in,Nf,Nt,dt)
+    signal_time2 = inverse_wavelet_freq_time(wave_in,Nf,Nt)
 
     t8 = perf_counter()
-    signal_time2 = inverse_wavelet_freq_time(wave_in,Nf,Nt,dt)
+    signal_time2 = inverse_wavelet_freq_time(wave_in,Nf,Nt)
     t9 = perf_counter()
 
     print('got inverse wavelet in time domain via fft in %5.3fs'%(t9-t8))
@@ -99,7 +99,7 @@ def test_inverse_wavelets():
         assert np.all(signal_time==signal_time_in)
         print('input wavelet domain data matches input time domain data')
     else:
-        assert np.allclose(signal_freq,signal_freq_in,atol=1.e-14,rtol=1.e-13)
+        assert np.allclose(signal_freq,signal_freq_in,atol=1.e-12,rtol=1.e-12)
         print('input wavelet domain data matches input frequency domain data')
 
         assert np.allclose(signal_time,signal_time_in,atol=1.e-14,rtol=1.e-15)

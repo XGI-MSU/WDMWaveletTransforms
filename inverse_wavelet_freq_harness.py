@@ -37,7 +37,7 @@ if __name__=='__main__':
 
 
     t0 = perf_counter()
-    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt,dt)
+    signal_freq = inverse_wavelet_freq(wave_in,Nf,Nt)
     t1 = perf_counter()
 
     print('got frequency domain transform in %5.3fs'%(t1-t0))
