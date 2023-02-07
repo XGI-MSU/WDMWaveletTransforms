@@ -1,10 +1,10 @@
 """helper functions for transform_time.py"""
 import numpy as np
-import fft_funcs as fft
-from transform_freq_funcs import phitilde_vec_norm,transform_wavelet_freq_helper
-from transform_time_funcs import phi_vec,transform_wavelet_time_helper
-from inverse_wavelet_freq_funcs import inverse_wavelet_freq_helper_fast
-from inverse_wavelet_time_funcs import inverse_wavelet_time_helper_fast
+import WDMWaveletTransforms.fft_funcs as fft
+from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec_norm,transform_wavelet_freq_helper
+from WDMWaveletTransforms.transform_time_funcs import phi_vec,transform_wavelet_time_helper
+from WDMWaveletTransforms.inverse_wavelet_freq_funcs import inverse_wavelet_freq_helper_fast
+from WDMWaveletTransforms.inverse_wavelet_time_funcs import inverse_wavelet_time_helper_fast
 
 def inverse_wavelet_time(wave_in,Nf,Nt,nx=4.,mult=32):
     """fast inverse wavelet transform to time domain"""

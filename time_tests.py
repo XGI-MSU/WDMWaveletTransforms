@@ -2,8 +2,8 @@
 from time import perf_counter
 import numpy as np
 
-from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time,transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
-import fft_funcs as fft
+from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time,transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
+import WDMWaveletTransforms.fft_funcs as fft
 
 if __name__=='__main__':
     #transform parameters

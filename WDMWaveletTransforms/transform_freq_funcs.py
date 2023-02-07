@@ -2,7 +2,7 @@
 import numpy as np
 from numba import njit
 import scipy.special
-import fft_funcs as fft
+import WDMWaveletTransforms.fft_funcs as fft
 
 
 def phitilde_vec(om,Nf,nx=4.):

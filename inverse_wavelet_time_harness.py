@@ -4,7 +4,7 @@ import sys
 from time import perf_counter
 import numpy as np
 
-from wavelet_transforms import inverse_wavelet_time
+from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_time
 
 if __name__=='__main__':
     #assume input .dat file is Nt rows by Nf columns

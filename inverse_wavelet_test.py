@@ -4,8 +4,8 @@ import numpy as np
 
 import pytest
 
-from wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time
-import fft_funcs as fft
+from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time
+import WDMWaveletTransforms.fft_funcs as fft
 
 #whether to expect exact match for input files
 EXACT_MATCH = False

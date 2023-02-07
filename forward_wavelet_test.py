@@ -4,8 +4,8 @@ import numpy as np
 
 import pytest
 
-from wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
-import fft_funcs as fft
+from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
+import WDMWaveletTransforms.fft_funcs as fft
 
 EXACT_MATCH = False
 
