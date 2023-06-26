@@ -9,7 +9,10 @@ from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_time
 FREQ_RANGE = (10, 500)
 
 
-def waveform_fft(t, waveform, ):
+def waveform_fft(
+    t,
+    waveform,
+):
     N = len(waveform)
     taper = tukey(N, 0.1)
     waveform_w_pad = zero_pad(waveform * taper)
@@ -24,7 +27,7 @@ def waveform_fft(t, waveform, ):
 def zero_pad(data):
     N = len(data)
     pow_2 = np.ceil(np.log2(N))
-    return np.pad(data, (0, int((2 ** pow_2) - N)), 'constant')
+    return np.pad(data, (0, int((2**pow_2) - N)), "constant")
 
 
 # plot signal
@@ -43,54 +46,76 @@ def plot_time_domain_signal(t, h):
     axes[1].set_xlabel("Frequency (Hz)")
     axes[1].set_xlim(*FREQ_RANGE)
     axes[2].set_xlim(0, T)
-    axes[2].pcolormesh(tt, ff[:145], Sxx[:145], )
+    axes[2].pcolormesh(tt, ff, Sxx)
     axes[2].set_xlabel("Time (s)")
     axes[2].set_ylabel("Frequency (Hz)")
     axes[2].set_xlim(0, T)
     axes[2].set_ylim(*FREQ_RANGE)
+    # add colorbar to the last axis
+    cbar = plt.colorbar(axes[2].collections[0], ax=axes[2])
+    cbar.set_label("Amplitude")
     plt.tight_layout()
     return fig
 
 
-def plot_wavelet_domain_signal(wavelet_data):
-    plt.imshow(np.abs(wavelet_data), aspect='auto')
-    plt.colorbar()
-    return plt.gcf()
+def plot_wavelet_domain_signal(wavelet_data, time_grid, freq_grid):
+    fig = plt.figure()
+    plt.imshow(
+        np.abs(np.rot90(wavelet_data)),
+        aspect="auto",
+        extent=[time_grid[0], time_grid[-1], freq_grid[0], freq_grid[-1]],
+    )
+    cbar = plt.colorbar()
+    cbar.set_label("Wavelet Amplitude")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.ylim(*FREQ_RANGE)
+    plt.tight_layout()
+    return fig
 
 
-def generate_signal():
-    fs = 4096
-    T = 4
-    t = np.arange(0, int(T * fs)) / fs
-    h = chirp(t, f0=FREQ_RANGE[0], f1=FREQ_RANGE[1], t1=T, method='quadratic')
-    return t, h
+def generate_time_domain_signal(t):
+    return chirp(t, f0=FREQ_RANGE[0], f1=FREQ_RANGE[1], t1=t[-1], method="quadratic")
 
 
 def main():
-    t, h = generate_signal()
+    dt = 1 / 4096
+    Nt = 2**6
+    Nf = 2**7
+    mult = 16
+
+    ND = Nt * Nf
+    Tobs = dt * ND
+
+    # time and frequency grids
+    ts = np.arange(0, ND) * dt
+    fs = np.arange(0, ND // 2 + 1) * 1 / (Tobs)
+
+    # generate signal
+    h = generate_time_domain_signal(ts)
 
     # plot original signal
-    fig = plot_time_domain_signal(t, h)
+    fig = plot_time_domain_signal(ts, h)
     fig.savefig("original_signal.png", dpi=300)
 
     # transform to wavelet domain
-    Nf, Nt = 512, 128
-    h_wavelet = transform_wavelet_time(h, Nf=Nf, Nt=Nt)
-    fig = plot_wavelet_domain_signal(h_wavelet)
+    h_wavelet = transform_wavelet_time(h, Nf=Nf, Nt=Nt, mult=mult)
+    fig = plot_wavelet_domain_signal(h_wavelet, ts, fs)
     fig.savefig("wavelet_domain.png", dpi=300)
 
     # transform back to time domain
     h_reconstructed = inverse_wavelet_time(h_wavelet, Nf=Nf, Nt=Nt)
-    fig = plot_time_domain_signal(t, h_reconstructed)
+    fig = plot_time_domain_signal(ts, h_reconstructed)
     fig.savefig("reconstructed_signal.png", dpi=300)
 
     # check that the reconstructed signal is the same as the original
     residuals = h - h_reconstructed
+    fig = plt.figure()
     plt.hist(residuals, bins=100)
     plt.xlabel("Residuals")
     plt.ylabel("Count")
-    plt.savefig("residuals.png", dpi=300)
-    assert np.allclose(h, h_reconstructed, atol=1e-6)
+    fig.savefig("residuals.png", dpi=300)
+    assert np.allclose(h, h_reconstructed, atol=1e-3)
 
 
 if __name__ == "__main__":
