@@ -1,11 +1,15 @@
 from typing import Tuple
 
 import matplotlib.pyplot as plt
+# import TwoSlopeNorm from matplotlib.colors
+from matplotlib.colors import TwoSlopeNorm
+
 import numpy as np
 from scipy.signal.windows import tukey
-from common import compute_frequency_optimal_snr, evolutionary_psd_from_stationary_psd, compute_wavelet_snr, plot, \
+from common import compute_frequency_optimal_snr, evolutionary_psd_from_stationary_psd, compute_wavelet_snr,  \
     get_wavelet_bins
 from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time
+
 
 from collections import namedtuple
 
@@ -88,23 +92,23 @@ def get_lisa_data():
 
     h_signal_t = waveform(a_true, f_true, fdot_true, t)
     freq = np.fft.fftfreq(ND, delta_t)[: ND // 2]
-    psd_f = lisa_psd_func(freq)
+    psd_vals = lisa_psd_func(freq)
     h_signal_f = np.fft.fft(h_signal_t)[: ND // 2]
     duration = delta_t * ND
 
     # skip first element to avoid division by zero
     freq = freq[1:]
-    psd_f = psd_f[1:]
+    psd_vals = psd_vals[1:]
     h_signal_f = h_signal_f[1:]
 
-    snr = compute_frequency_optimal_snr(h_signal_f, psd_f, duration)
-    return h_signal_t, t, h_signal_f, h_signal_f, psd_f, snr
+    snr = compute_frequency_optimal_snr(h_signal_f, psd_vals, duration)
+    return freq,t,h_signal_t, h_signal_f, psd_vals, snr
 
 
 def main():
     np.random.seed(1234)
 
-    h_signal_t, t, h_signal_f, f, psd_f, snr = get_lisa_data()
+    freq, t, h_signal_t, h_signal_f, psd, snr = get_lisa_data()
     ND = len(t)
     Nf = 256
     Nt = ND // Nf
@@ -116,24 +120,34 @@ def main():
 
     # h_wavelet = from_time_to_wavelet(h_time, Nt=Nt)
     psd_wavelet = evolutionary_psd_from_stationary_psd(
-        psd=psd_f,
-        psd_f=f,
+        psd=psd,
+        psd_f=freq,
         f_grid=freq_grid,
         t_grid=time_grid,
     )
 
     compute_frequency_optimal_snr(
-        h_freq=h_signal_f, psd=psd_f, duration=duration
+        h_freq=h_signal_f, psd=psd, duration=duration
     )
     wavelet_snr = compute_wavelet_snr(h_wavelet, psd_wavelet)
 
     print(f"SNR in time domain (ND:{ND}): {snr:.2f}")
     print(f"SNR in wavelet domain (Nf{Nf}xNt{Nt}): {wavelet_snr:.2f}")
 
-    fig, axes = plt.subplots(2,1, figsize=(12, 10))
-    axes[0].loglog(f, np.abs(h_signal_f))
-    axes[0].loglog(f, psd_f)
+    fig, axes = plt.subplots(2,1, figsize=(5, 8))
+    axes[0].loglog(freq, np.abs(h_signal_f), label='Signal')
+    axes[0].loglog(freq, psd, label='PSD')
+    axes[0].legend()
+    axes[0].set_xlabel("Frequency [Hz]")
+    axes[0].set_ylabel("PSD")
     axes[0].set_title("Frequency domain signal")
+    axes[1].pcolor(time_grid, freq_grid, h_wavelet.T, cmap="RdBu", norm=TwoSlopeNorm(vcenter=0))
+    axes[1].set_ylim(1e-4, 1e-2)
+    axes[1].set_xlabel("Time [s]")
+    axes[1].set_ylabel("Frequency [Hz]")
+    axes[0].text(0.1, 0.85, f"SNR: {snr:.2f}", transform=axes[0].transAxes, fontsize='x-large')
+    axes[1].text(0.1, 0.85, f"SNR: {wavelet_snr:.2f}", transform=axes[1].transAxes, fontsize='x-large')
+    fig.savefig("lisa_wdb_snr.pdf", dpi=300)
 
 
 if __name__ == "__main__":
