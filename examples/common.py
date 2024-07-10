@@ -6,8 +6,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 
-
-
 def compute_wavelet_snr(h: "Wavelet", PSD: "Wavelet") -> float:
     """Compute the SNR of a model h[ti,fi] given data d[ti,fi] and PSD[ti,fi].
 
@@ -32,7 +30,7 @@ def compute_wavelet_snr(h: "Wavelet", PSD: "Wavelet") -> float:
     return np.sqrt(snr_sqrd)
 
 
-def compute_frequency_optimal_snr(h_freq, psd, duration)-> float:
+def compute_frequency_optimal_snr(h_freq, psd, duration) -> float:
     """
     A18 from Veitch et al. 2009
     https://arxiv.org/abs/0911.3820
@@ -47,11 +45,12 @@ def __noise_weighted_inner_product(aa, bb, power_spectral_density, duration):
     integrand = np.conj(aa) * bb / power_spectral_density
     return (4 / duration) * np.sum(integrand)
 
+
 def evolutionary_psd_from_stationary_psd(
-        psd: np.ndarray,
-        psd_f: np.ndarray,
-        f_grid,
-        t_grid,
+    psd: np.ndarray,
+    psd_f: np.ndarray,
+    f_grid,
+    t_grid,
 ) -> "Wavelet":
     """
     PSD[ti,fi] = PSD[fi] * delta_f
@@ -64,20 +63,19 @@ def evolutionary_psd_from_stationary_psd(
     freq_data = psd
     nan_val = np.max(freq_data)
     psd_grid = (
-            interp1d(
-                psd_f,
-                freq_data,
-                kind="nearest",
-                fill_value=nan_val,
-                bounds_error=False,
-            )(f_grid)
-            # * delta_F
+        interp1d(
+            psd_f,
+            freq_data,
+            kind="nearest",
+            fill_value=nan_val,
+            bounds_error=False,
+        )(f_grid)
+        # * delta_F
     )
 
     # repeat the PSD for each time bin
     psd_grid = np.repeat(psd_grid[None, :], Nt, axis=0)
     return psd_grid
-
 
 
 def get_wavelet_bins(duration, data_len, Nf, Nt):
@@ -97,7 +95,4 @@ def get_wavelet_bins(duration, data_len, Nf, Nt):
     f_bins = np.arange(0, Nf) * delta_f
     t_bins = np.arange(0, Nt) * delta_t
 
-
     return t_bins, f_bins
-
-

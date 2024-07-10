@@ -13,8 +13,12 @@ from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time
 import bilby
 from typing import Tuple
 import numpy as np
-from common import compute_wavelet_snr, evolutionary_psd_from_stationary_psd, get_wavelet_bins, \
-    compute_frequency_optimal_snr
+from common import (
+    compute_wavelet_snr,
+    evolutionary_psd_from_stationary_psd,
+    get_wavelet_bins,
+    compute_frequency_optimal_snr,
+)
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -82,15 +86,13 @@ def _get_ifo(t0=0.0, noise=True):
 
 
 def inject_signal_in_noise(
-        mc, q=1, distance=1000.0, noise=True
+    mc, q=1, distance=1000.0, noise=True
 ) -> Tuple[TIMESERIES, float]:
     injection_parameters = GW_PARMS.copy()
     (
         injection_parameters["mass_1"],
         injection_parameters["mass_2"],
-    ) = bilby.gw.conversion.chirp_mass_and_mass_ratio_to_component_masses(
-        mc, q
-    )
+    ) = bilby.gw.conversion.chirp_mass_and_mass_ratio_to_component_masses(mc, q)
     injection_parameters["luminosity_distance"] = distance
     ifos = _get_ifo(injection_parameters["geocent_time"] + 1.5, noise=noise)
     ifos.inject_signal(
@@ -109,8 +111,19 @@ def inject_signal_in_noise(
     return timeseries, freqseries, np.abs(snr), psd
 
 
-def plot(signal_t, signal_f, optimal_snr_ht, psd, signal_wavelet, time_grid, freq_grid, psd_wavelet, snr_wavelet,
-         DURATION, MINIMUM_FREQUENCY):
+def plot(
+    signal_t,
+    signal_f,
+    optimal_snr_ht,
+    psd,
+    signal_wavelet,
+    time_grid,
+    freq_grid,
+    psd_wavelet,
+    snr_wavelet,
+    DURATION,
+    MINIMUM_FREQUENCY,
+):
     # plot Timeseries, wavelet signal and PSD
     fig, ax = plt.subplots(2, 2, figsize=(12, 10))
     ax[0, 0].plot(signal_t.time, signal_t.data)
@@ -119,18 +132,36 @@ def plot(signal_t, signal_f, optimal_snr_ht, psd, signal_wavelet, time_grid, fre
     ax[0, 0].set_ylabel("Strain")
     ax[0, 0].set_title("Time domain signal")
     # ANNOTATE SNR
-    ax[0, 0].text(0.1, 0.85, f"SNR: {optimal_snr_ht:.2f}", transform=ax[0, 0].transAxes, fontsize='x-large')
+    ax[0, 0].text(
+        0.1,
+        0.85,
+        f"SNR: {optimal_snr_ht:.2f}",
+        transform=ax[0, 0].transAxes,
+        fontsize="x-large",
+    )
     ax[0, 1].loglog(signal_f.freq, psd)
     ax[0, 1].loglog(signal_f.freq, np.abs(signal_f.data))
 
     ax[0, 1].set_title("PSD in frequency domain")
 
-    ax[1, 0].pcolor(time_grid, freq_grid, signal_wavelet.T, cmap="RdBu", norm=colors.TwoSlopeNorm(vcenter=0))
+    ax[1, 0].pcolor(
+        time_grid,
+        freq_grid,
+        signal_wavelet.T,
+        cmap="RdBu",
+        norm=colors.TwoSlopeNorm(vcenter=0),
+    )
     ax[1, 0].set_ylim(MINIMUM_FREQUENCY, MAXIMUM_FREQUENCY / 2)
     ax[1, 0].set_xlabel("Time [s]")
     ax[1, 0].set_ylabel("Frequency [Hz]")
     ax[1, 0].set_title("Wavelet transform")
-    ax[1, 0].text(0.1, 0.85, f"SNR: {snr_wavelet:.2f}", transform=ax[1, 0].transAxes, fontsize='x-large')
+    ax[1, 0].text(
+        0.1,
+        0.85,
+        f"SNR: {snr_wavelet:.2f}",
+        transform=ax[1, 0].transAxes,
+        fontsize="x-large",
+    )
     ax[1, 1].pcolor(time_grid, freq_grid, np.log(psd_wavelet.T), cmap="viridis")
     ax[1, 1].set_ylim(MINIMUM_FREQUENCY, MAXIMUM_FREQUENCY / 2)
     ax[1, 1].set_title("PSD in wavelet domain")
@@ -146,9 +177,12 @@ def main():
     Nf = ND // Nt
     dt = signal_t.time[1] - signal_t.time[0]
 
-    signal_wavelet = transform_wavelet_time(signal_t.data, Nf, Nt)
+    signal_wavelet = transform_wavelet_time(signal_t.data, Nf, Nt) * dt * np.sqrt(2)
     time_grid, freq_grid = get_wavelet_bins(DURATION, ND, Nf, Nt)
-    psd_wavelet = evolutionary_psd_from_stationary_psd(psd, signal_f.freq, freq_grid, time_grid) * dt
+    psd_wavelet = (
+        evolutionary_psd_from_stationary_psd(psd, signal_f.freq, freq_grid, time_grid)
+        * dt
+    )
 
     # ignore the freq below 20 Hz
     # get idx where freq_grid > 20hz
@@ -156,18 +190,23 @@ def main():
     freq_grid = freq_grid[idx:]
     psd_wavelet = psd_wavelet[:, idx:]
     signal_wavelet = signal_wavelet[:, idx:]
-    snr_wavelet = compute_wavelet_snr(signal_wavelet, psd_wavelet) * np.sqrt(2)
+    snr_wavelet = compute_wavelet_snr(signal_wavelet, psd_wavelet)
     print("SNR in time domain:", optimal_snr_ht)
     print(f"ND: {ND}, Nt: {Nt}, Nf: {Nf}")
     print("SNR in wavelet domain:", snr_wavelet)
     plot(
-        signal_t, signal_f,
+        signal_t,
+        signal_f,
         optimal_snr_ht,
         psd,
-        signal_wavelet, time_grid, freq_grid,
-        psd_wavelet, snr_wavelet,
-        DURATION, MINIMUM_FREQUENCY
-    ).savefig('lvk_cbc_snr.pdf', dpi=300)
+        signal_wavelet,
+        time_grid,
+        freq_grid,
+        psd_wavelet,
+        snr_wavelet,
+        DURATION,
+        MINIMUM_FREQUENCY,
+    ).savefig("lvk_cbc_snr.pdf", dpi=300)
 
 
 if __name__ == "__main__":
