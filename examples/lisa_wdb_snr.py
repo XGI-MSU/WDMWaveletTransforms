@@ -112,7 +112,8 @@ def main():
     ND = len(t)
     Nf = 256
     Nt = ND // Nf
-    duration = ND * t[1]
+    dt = t[1]
+    duration = ND * dt
 
     h_time = TIMESERIES(h_signal_t, t)
     h_wavelet = transform_wavelet_time(h_time.data, Nf=Nf, Nt=Nt)
@@ -124,12 +125,12 @@ def main():
         psd_f=freq,
         f_grid=freq_grid,
         t_grid=time_grid,
-    )
+    ) * dt
 
     compute_frequency_optimal_snr(
         h_freq=h_signal_f, psd=psd, duration=duration
     )
-    wavelet_snr = compute_wavelet_snr(h_wavelet, psd_wavelet)
+    wavelet_snr = compute_wavelet_snr(h_wavelet, psd_wavelet) * np.sqrt(2)
 
     print(f"SNR in time domain (ND:{ND}): {snr:.2f}")
     print(f"SNR in wavelet domain (Nf{Nf}xNt{Nt}): {wavelet_snr:.2f}")

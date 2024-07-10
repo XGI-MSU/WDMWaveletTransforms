@@ -71,7 +71,7 @@ def evolutionary_psd_from_stationary_psd(
                 fill_value=nan_val,
                 bounds_error=False,
             )(f_grid)
-            * delta_F
+            # * delta_F
     )
 
     # repeat the PSD for each time bin

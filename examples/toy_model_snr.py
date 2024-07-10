@@ -24,8 +24,8 @@ ND = 4096
 time = np.linspace(0, ND * dt, ND)
 duration = ND * dt
 signal_t = np.sin(2 * np.pi * true_f * time)
-signal_f = np.fft.fft(signal_t)
-freq = np.fft.fftfreq(ND, dt)
+signal_f = np.fft.fftshift(np.fft.fft(signal_t))
+freq = np.fft.fftshift(np.fft.fftfreq(ND, dt))
 
 psd_f = np.ones(len(signal_f))
 signal_t = TIMESERIES(
@@ -49,17 +49,18 @@ assert np.isclose(
 Nf = 64
 Nt = ND // Nf
 signal_wavelet = transform_wavelet_time(signal_t.data, Nf=Nf, Nt=Nt)
-freq_grid, time_grid = get_wavelet_bins(duration, ND, Nf, Nt)
+time_grid, freq_grid = get_wavelet_bins(duration, ND, Nf, Nt)
 psd_wavelet = evolutionary_psd_from_stationary_psd(
     psd=psd_f,
     psd_f=np.arange(len(psd_f)),
     f_grid=freq_grid,
     t_grid=time_grid,
 )
-wavelet_snr = compute_wavelet_snr(signal_wavelet, psd_wavelet)
+psd_wavelet = psd_wavelet * dt
+wavelet_snr = compute_wavelet_snr(signal_wavelet, psd_wavelet) * np.sqrt(2)
 
 # Part4: Plot
-fig, axes = plt.subplots(2, 1, figsize=(5, 8))
+fig, axes = plt.subplots(3, 1, figsize=(5, 10))
 axes[0].loglog(freq, np.abs(signal_f), label='Signal')
 axes[0].axvline(true_f, color="red", linestyle="--", label="True frequency")
 axes[0].plot(freq, psd_f, label="PSD")
@@ -71,9 +72,15 @@ axes[0].set_title("Signal and PSD")
 axes[0].set_xlabel("Frequency [Hz]")
 axes[0].set_ylabel("PSD")
 axes[1].pcolor(time_grid, freq_grid, signal_wavelet.T, cmap="RdBu", norm=colors.TwoSlopeNorm(vcenter=0))
+# add colorbar
+
 axes[1].text(0.1, 0.85, f"Wavelet SNR: {wavelet_snr:.2f}", transform=axes[1].transAxes, fontsize='x-large')
-axes[1].set_xlabel("Time bins")
-axes[1].set_ylabel("Frequency bins")
+axes[1].set_xlabel("Time [s]")
+axes[1].set_ylabel("Frequency [Hz]")
+_ = axes[2].specgram(signal_t.data, NFFT=256, Fs=fs, noverlap=128)
+axes[2].set_xlabel("Time [s]")
+axes[2].set_ylabel("Frequency [Hz]")
+
 fig.savefig('toy_model_snr.pdf', dpi=300)
 
 assert np.isclose(
