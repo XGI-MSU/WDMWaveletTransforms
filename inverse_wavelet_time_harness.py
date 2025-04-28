@@ -30,15 +30,15 @@ if __name__=='__main__':
     Tobs = dt*ND
 
     #time and frequency grids
-    ts = np.arange(0,ND)*dt
+    ts = np.arange(0, ND)*dt
 
     t0 = perf_counter()
-    signal_time = inverse_wavelet_time(wave_in,Nf,Nt,mult=mult)
+    signal_time = inverse_wavelet_time(wave_in, Nf, Nt, mult=mult)
     t1 = perf_counter()
 
     print('got time domain transform in %5.3fs'%(t1-t0))
 
     t4 = perf_counter()
-    np.savetxt(file_out,np.vstack([ts,signal_time]).T)
+    np.savetxt(file_out, np.vstack([ts, signal_time]).T)
     t5 = perf_counter()
     print('saved file in %5.3fs'%(t5-t4))
