@@ -7,7 +7,7 @@ import numpy as np
 
 from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq_time
 
-if __name__=='__main__':
+def main():
     if len(sys.argv)!=6:
         print("forward_wavelet_freq_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf")
         sys.exit(1)
@@ -45,3 +45,7 @@ if __name__=='__main__':
     np.savetxt(file_out,wave_time)
     t5 = perf_counter()
     print('saved file in %5.3fs'%(t5-t4))
+
+
+if __name__=='__main__':
+    main()

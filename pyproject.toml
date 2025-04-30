@@ -1,0 +1,29 @@
+[project]
+name = "WDMWaveletTransforms"
+version = "0.0.1"
+description = "A Python implementation of WDM Wavelet Transforms"
+readme = "README.md"
+authors = [
+  { name="Matthew C. Digman", email="matthew.digman@montana.edu" }
+]
+license = { file = "LICENSE" }
+dependencies = [
+    "numpy",
+    "scipy",
+    "numba",
+    "pytest"
+]
+requires-python = ">=3.7"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+forward-wavelet-freq-harness = "WDMWaveletTransforms.cli.forward_wavelet_freq_harness:main"
+forward-wavelet-freq-time-harness = "WDMWaveletTransforms.cli.forward_wavelet_freq_time_harness:main"
+forward-wavelet-time-harness = "WDMWaveletTransforms.cli.forward_wavelet_time_harness:main"
+inverse-wavelet-freq-harness = "WDMWaveletTransforms.cli.inverse_wavelet_freq_harness:main"
+inverse-wavelet-freq-time-harness = "WDMWaveletTransforms.cli.inverse_wavelet_freq_time_harness:main"
+inverse-wavelet-time-harness = "WDMWaveletTransforms.cli.inverse_wavelet_time_harness:main"
+
