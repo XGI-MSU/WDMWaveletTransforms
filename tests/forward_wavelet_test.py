@@ -3,6 +3,8 @@ from time import perf_counter
 import numpy as np
 
 import pytest
+from pathlib import Path
+
 
 from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
 import WDMWaveletTransforms.fft_funcs as fft
@@ -12,12 +14,12 @@ EXACT_MATCH = False
 def test_inverse_wavelets():
     """test that forward wavelet transforms perform precisely as recorded in the input dat files
     for random input data"""
-    file_freq = 'rand_wave_freq.dat'
-    file_time = 'rand_wave_time.dat'
+    file_freq = Path(__file__).parent / "data" / "rand_wave_freq.dat"
+    file_time = Path(__file__).parent / "data" / "rand_wave_time.dat"
 
-    file_wave = 'rand_wavelet.dat'
-    file_wave_freq = 'rand_wavelet_freq.dat'
-    file_wave_time = 'rand_wavelet_time.dat'
+    file_wave = Path(__file__).parent / "data" / "rand_wavelet.dat"
+    file_wave_freq = Path(__file__).parent / "data" / "rand_wavelet_freq.dat"
+    file_wave_time = Path(__file__).parent / "data" / "rand_wavelet_time.dat"
 
     dt = 30.
 

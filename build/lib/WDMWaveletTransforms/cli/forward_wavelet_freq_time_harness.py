@@ -1,15 +1,15 @@
-""""harness for computing forward frequency domain wavelet transform, take input .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"
+""""harness for computing forward time domain wavelet transform via fft, take input .dat file in time domain (columns ftime, h(t)"
 write to .dat file in wavelet domain (Nt rows by Nf columns)"""
 
 import sys
 from time import perf_counter
 import numpy as np
 
-from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time
+from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq_time
 
-if __name__=='__main__':
-    if len(sys.argv)!=7:
-        print("forward_wavelet_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf mult")
+def main():
+    if len(sys.argv)!=6:
+        print("forward_wavelet_freq_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf")
         sys.exit(1)
 
     #transform parameters
@@ -36,12 +36,16 @@ if __name__=='__main__':
     assert np.all(ts==ts_in)
 
     t0 = perf_counter()
-    wave_freq = transform_wavelet_time(signal_time,Nf,Nt)
+    wave_time = transform_wavelet_freq_time(signal_time,Nf,Nt)
     t1 = perf_counter()
 
     print('got time domain transform in %5.3fs'%(t1-t0))
 
     t4 = perf_counter()
-    np.savetxt(file_out,wave_freq)
+    np.savetxt(file_out,wave_time)
     t5 = perf_counter()
     print('saved file in %5.3fs'%(t5-t4))
+
+
+if __name__=='__main__':
+    main()

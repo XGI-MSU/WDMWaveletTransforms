@@ -2,37 +2,37 @@
 import os
 import numpy as np
 import pytest
-
+from pathlib import Path
 
 EXACT_MATCH = False
 
 def test_harness_writes():
     """test that the command line harnesses match expected results"""
-    filename_wavelet_in = 'rand_wavelet.dat'
-    filename_freq_in = 'rand_wave_freq.dat'
-    filename_time_in = 'rand_wave_time.dat'
+    filename_wavelet_in = Path(__file__).parent / "data" / "rand_wavelet.dat"
+    filename_freq_in = Path(__file__).parent / "data" / "rand_wave_freq.dat"
+    filename_time_in = Path(__file__).parent / "data" / "rand_wave_time.dat"
 
-    filename_fw_in = 'rand_wavelet_freq.dat'
-    filename_tw_in = 'rand_wavelet_time.dat'
+    filename_fw_in = Path(__file__).parent / "data" / "rand_wavelet_freq.dat"
+    filename_tw_in = Path(__file__).parent / "data" / "rand_wavelet_time.dat"
 
-    filename_fw_out = 'rand_wavelet_freq_test.dat'
-    filename_tw_out = 'rand_wavelet_time_test.dat'
-    filename_tfw_out = 'rand_wavelet_time_freq_test.dat'
-    filename_wf_out = 'rand_wave_freq_test.dat'
-    filename_wt_out = 'rand_wave_time_test.dat'
-    filename_wft_out = 'rand_wave_freq_time_test.dat'
+    filename_fw_out = Path(__file__).parent / "data" / "rand_wavelet_freq_test.dat"
+    filename_tw_out = Path(__file__).parent / "data" / "rand_wavelet_time_test.dat"
+    filename_tfw_out = Path(__file__).parent / "data" / "rand_wavelet_time_freq_test.dat"
+    filename_wf_out = Path(__file__).parent / "data" / "rand_wave_freq_test.dat"
+    filename_wt_out = Path(__file__).parent / "data" / "rand_wave_time_test.dat"
+    filename_wft_out = Path(__file__).parent / "data" / "rand_wave_freq_time_test.dat"
 
     mult = 32
     dt = 30.
     Nt = 128
     Nf = 512
 
-    os.system("python forward_wavelet_freq_harness.py "+filename_freq_in+" "+filename_fw_out+" "+str(dt)+" "+str(Nt)+" "+str(Nf))
-    os.system("python forward_wavelet_time_harness.py "+filename_time_in+" "+filename_tw_out+" "+str(dt)+" "+str(Nt)+" "+str(Nf)+" "+str(mult))
-    os.system("python forward_wavelet_freq_time_harness.py "+filename_time_in+" "+filename_tfw_out+" "+str(dt)+" "+str(Nt)+" "+str(Nf))
-    os.system("python inverse_wavelet_freq_harness.py "+filename_wavelet_in+" "+filename_wf_out+" "+str(dt))
-    os.system("python inverse_wavelet_time_harness.py "+filename_wavelet_in+" "+filename_wt_out+" "+str(dt)+" "+str(mult))
-    os.system("python inverse_wavelet_freq_time_harness.py "+filename_wavelet_in+" "+filename_wft_out+" "+str(dt))
+    os.system("forward_wavelet_freq_harness "+str(filename_freq_in)+" "+str(filename_fw_out)+" "+str(dt)+" "+str(Nt)+" "+str(Nf))
+    os.system("forward_wavelet_time_harness "+str(filename_time_in)+" "+str(filename_tw_out)+" "+str(dt)+" "+str(Nt)+" "+str(Nf)+" "+str(mult))
+    os.system("forward_wavelet_freq_time_harness "+str(filename_time_in)+" "+str(filename_tfw_out)+" "+str(dt)+" "+str(Nt)+" "+str(Nf))
+    os.system("inverse_wavelet_freq_harness "+str(filename_wavelet_in)+" "+str(filename_wf_out)+" "+str(dt))
+    os.system("inverse_wavelet_time_harness "+str(filename_wavelet_in)+" "+str(filename_wt_out)+" "+str(dt)+" "+str(mult))
+    os.system("inverse_wavelet_freq_time_harness "+str(filename_wavelet_in)+" "+str(filename_wft_out)+" "+str(dt))
 
     w_in = np.loadtxt(filename_wavelet_in)
     fs_in,f_inr,f_ini = np.loadtxt(filename_freq_in).T

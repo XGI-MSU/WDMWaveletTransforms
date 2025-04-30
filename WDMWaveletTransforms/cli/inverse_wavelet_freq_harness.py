@@ -6,7 +6,7 @@ import numpy as np
 
 from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq
 
-if __name__=='__main__':
+def main():
     #assume input .dat file is Nt rows by Nf columns
     if len(sys.argv)!=4:
         print("inverse_wavelet_freq_harness.py filename_wavelet_in filename_freq_out dt")
@@ -46,3 +46,7 @@ if __name__=='__main__':
     np.savetxt(file_out,np.vstack([fs,np.real(signal_freq),np.imag(signal_freq)]).T)
     t5 = perf_counter()
     print('saved file in %5.3fs'%(t5-t4))
+
+
+if __name__=='__main__':
+    main()
