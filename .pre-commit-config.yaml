@@ -1,0 +1,32 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: check-case-conflict
+    -   id: check-docstring-first
+    -   id: check-json
+    -   id: check-toml
+    -   id: check-xml
+    -   id: check-ast
+    -   id: check-symlinks
+    -   id: check-vcs-permalinks
+    -   id: debug-statements
+    -   id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+    -   id: detect-private-key
+    -   id: mixed-line-ending
+    -   id: pretty-format-json
+        args: [--autofix]
+    -   id: requirements-txt-fixer
+
+-   repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+    -   id: isort
+        name: isort (python)
