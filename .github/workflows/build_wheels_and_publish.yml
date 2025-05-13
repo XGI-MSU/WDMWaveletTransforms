@@ -1,0 +1,81 @@
+name: Build wheel and publish
+
+on: 
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-wheels-and-dist:
+    name: Build ${{ matrix.python-version }} wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.9, "3.10", 3.11, 3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v5
+      name: Install Python
+      with:
+        python-version: "3.10"
+    
+    - name: Install software dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install numpy scipy numba pytest
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install setuptools wheel build cibuildwheel
+
+    - name: Build source and wheels distribution on MacOS
+      if: runner.os == 'macOS'
+      run: |
+        python -m build --outdir dist
+        find ./dist/*.whl | xargs pip install
+        
+    - name: Build source and wheels distribution on Linux
+      if: runner.os == 'Linux'
+      run: |
+        python -m build --outdir dist
+        
+    - uses: actions/upload-artifact@v4
+      with:
+        name: dist-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./dist/*
+
+  publish:
+    needs: [build-wheels-and-dist]
+    name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.10"]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Collect distributions
+      run: |
+        mkdir -p dist
+        find artifacts -type f -name '*.whl' -exec cp {} dist/ \;
+        find artifacts -type f -name '*.tar.gz' -exec cp {} dist/ \;
+
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
