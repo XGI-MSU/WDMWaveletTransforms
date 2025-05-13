@@ -53,18 +53,6 @@ def tukey(data, alpha, N):
         data[i] *= f_mult
 
 
-def transform_wavelet_freq_helper(data, Nf, Nt, phif):
-    """helper to do the wavelet transform using the fast wavelet domain transform"""
-    wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
-
-    DX = np.zeros(Nt, dtype=np.complex128)
-    for m in range(0, Nf+1):
-        DX_assign_loop(m, Nt, Nf, DX, data, phif)
-        DX_trans = fft.ifft(DX, Nt)
-        DX_unpack_loop(m, Nt, Nf, DX_trans, wave)
-    return wave
-
-
 @njit()
 def DX_assign_loop(m, Nt, Nf, DX, data, phif):
     """helper for assigning DX in the main loop"""
@@ -115,3 +103,15 @@ def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
                     wave[n, m] = np.imag(DX_trans[n])
                 else:
                     wave[n, m] = np.real(DX_trans[n])
+
+
+def transform_wavelet_freq_helper(data, Nf, Nt, phif):
+    """helper to do the wavelet transform using the fast wavelet domain transform"""
+    wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
+
+    DX = np.zeros(Nt, dtype=np.complex128)
+    for m in range(0, Nf+1):
+        DX_assign_loop(m, Nt, Nf, DX, data, phif)
+        DX_trans = fft.ifft(DX, Nt)
+        DX_unpack_loop(m, Nt, Nf, DX_trans, wave)
+    return wave

@@ -6,32 +6,6 @@ import WDMWaveletTransforms.fft_funcs as fft
 from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
 
 
-def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
-    """helper function do do the wavelet transform in the time domain"""
-    # the time domain data stream
-    ND = Nf*Nt
-
-    # mult, can cause bad leakage if it is too small but may be possible to mitigate
-    # Filter is mult times pixel with in time
-
-    K = mult*2*Nf
-
-    # windowed data packets
-    wdata = np.zeros(K)
-
-    wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
-    data_pad = np.zeros(ND+K)
-    data_pad[:ND] = data
-    data_pad[ND:ND+K] = data[:K]
-
-    for i in range(0, Nt):
-        assign_wdata(i, K, ND, Nf, wdata, data_pad, phi)
-        wdata_trans = fft.rfft(wdata, K)
-        pack_wave(i, mult, Nf, wdata_trans, wave)
-
-    return wave
-
-
 @njit()
 def assign_wdata(i, K, ND, Nf, wdata, data_pad, phi):
     """assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
@@ -62,6 +36,32 @@ def pack_wave(i, mult, Nf, wdata_trans, wave):
             wave[i, j] = -np.imag(wdata_trans[j*mult])
         else:
             wave[i, j] = np.real(wdata_trans[j*mult])
+
+
+def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
+    """helper function do do the wavelet transform in the time domain"""
+    # the time domain data stream
+    ND = Nf*Nt
+
+    # mult, can cause bad leakage if it is too small but may be possible to mitigate
+    # Filter is mult times pixel with in time
+
+    K = mult*2*Nf
+
+    # windowed data packets
+    wdata = np.zeros(K)
+
+    wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
+    data_pad = np.zeros(ND+K)
+    data_pad[:ND] = data
+    data_pad[ND:ND+K] = data[:K]
+
+    for i in range(0, Nt):
+        assign_wdata(i, K, ND, Nf, wdata, data_pad, phi)
+        wdata_trans = fft.rfft(wdata, K)
+        pack_wave(i, mult, Nf, wdata_trans, wave)
+
+    return wave
 
 
 def phi_vec(Nf, nx=4., mult=16):

@@ -5,23 +5,6 @@ from numba import njit
 import WDMWaveletTransforms.fft_funcs as fft
 
 
-# @njit()
-def inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt):
-    """jit compatible loop for inverse_wavelet_freq"""
-    ND = Nf*Nt
-
-    prefactor2s = np.zeros(Nt, np.complex128)
-    res = np.zeros(ND//2+1, dtype=np.complex128)
-
-    for m in range(0, Nf+1):
-        pack_wave_inverse(m, Nt, Nf, prefactor2s, wave_in)
-        # with numba.objmode(fft_prefactor2s="complex128[:]"):
-        fft_prefactor2s = fft.fft(prefactor2s)
-        unpack_wave_inverse(m, Nt, Nf, phif, fft_prefactor2s, res)
-
-    return res
-
-
 @njit()
 def unpack_wave_inverse(m, Nt, Nf, phif, fft_prefactor2s, res):
     """helper for unpacking results of frequency domain inverse transform"""
@@ -91,3 +74,20 @@ def pack_wave_inverse(m, Nt, Nf, prefactor2s, wave_in):
                 mult2 = 1
 
             prefactor2s[n] = mult2*val
+
+
+# @njit()
+def inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt):
+    """jit compatible loop for inverse_wavelet_freq"""
+    ND = Nf*Nt
+
+    prefactor2s = np.zeros(Nt, np.complex128)
+    res = np.zeros(ND//2+1, dtype=np.complex128)
+
+    for m in range(0, Nf+1):
+        pack_wave_inverse(m, Nt, Nf, prefactor2s, wave_in)
+        # with numba.objmode(fft_prefactor2s="complex128[:]"):
+        fft_prefactor2s = fft.fft(prefactor2s)
+        unpack_wave_inverse(m, Nt, Nf, phif, fft_prefactor2s, res)
+
+    return res

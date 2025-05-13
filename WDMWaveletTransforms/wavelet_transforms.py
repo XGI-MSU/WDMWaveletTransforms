@@ -20,16 +20,16 @@ def inverse_wavelet_time(wave_in, Nf, Nt, nx=4., mult=32):
     return inverse_wavelet_time_helper_fast(wave_in, phi, Nf, Nt, mult)
 
 
-def inverse_wavelet_freq_time(wave_in, Nf, Nt, nx=4.):
-    """inverse wavlet transform to time domain via fourier transform of frequency domain"""
-    res_f = inverse_wavelet_freq(wave_in, Nf, Nt, nx)
-    return fft.irfft(res_f)
-
-
 def inverse_wavelet_freq(wave_in, Nf, Nt, nx=4.):
     """inverse wavelet transform to freq domain signal"""
     phif = phitilde_vec_norm(Nf, Nt, nx)
     return inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt)
+
+
+def inverse_wavelet_freq_time(wave_in, Nf, Nt, nx=4.):
+    """inverse wavlet transform to time domain via fourier transform of frequency domain"""
+    res_f = inverse_wavelet_freq(wave_in, Nf, Nt, nx)
+    return fft.irfft(res_f)
 
 
 def transform_wavelet_time(data, Nf, Nt, nx=4., mult=32):
@@ -43,14 +43,14 @@ def transform_wavelet_time(data, Nf, Nt, nx=4., mult=32):
     return wave
 
 
+def transform_wavelet_freq(data, Nf, Nt, nx=4.):
+    """do the wavelet transform using the fast wavelet domain transform"""
+    phif = 2/Nf*phitilde_vec_norm(Nf, Nt, nx)
+    return transform_wavelet_freq_helper(data, Nf, Nt, phif)
+
+
 def transform_wavelet_freq_time(data, Nf, Nt, nx=4.):
     """transform time domain data into wavelet domain via fft and then frequency transform"""
     data_fft = fft.rfft(data)
 
     return transform_wavelet_freq(data_fft, Nf, Nt, nx)
-
-
-def transform_wavelet_freq(data, Nf, Nt, nx=4.):
-    """do the wavelet transform using the fast wavelet domain transform"""
-    phif = 2/Nf*phitilde_vec_norm(Nf, Nt, nx)
-    return transform_wavelet_freq_helper(data, Nf, Nt, phif)
