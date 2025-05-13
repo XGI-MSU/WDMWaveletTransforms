@@ -30,3 +30,9 @@ repos:
     hooks:
     -   id: isort
         name: isort (python)
+
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.1
+    hooks:
+    -   id: pyupgrade
+        args: [--keep-percent-format]
