@@ -1,8 +1,9 @@
 """verify all the harness functions match expected results"""
 import os
+from pathlib import Path
+
 import numpy as np
 import pytest
-from pathlib import Path
 
 EXACT_MATCH = False
 

@@ -2,9 +2,11 @@
 and write to .dat file in time domain (columns frequency, h(t))"""
 import sys
 from time import perf_counter
+
 import numpy as np
 
 from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq_time
+
 
 def main():
     #assume input .dat file is Nt rows by Nf columns

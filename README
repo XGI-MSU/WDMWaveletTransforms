@@ -19,14 +19,14 @@ Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 MA  02111-1307  USA
 
 =============Overview=============
-This module implements the fast forward and inverse WDM wavelet transforms in python from both the time and frequency domains. 
-The frequency domain transforms are inherently much faster and more accurate. 
+This module implements the fast forward and inverse WDM wavelet transforms in python from both the time and frequency domains.
+The frequency domain transforms are inherently much faster and more accurate.
 The wavelet domain->frequency domain and frequency domain->wavelet domain transforms
-are nearly exact numerical inverses of each other with parameters similar to the test parameters used on gaussian random noise. 
+are nearly exact numerical inverses of each other with parameters similar to the test parameters used on gaussian random noise.
 
 ==========Data Structure==========
 Currently, we assume both Nt and Nf are even. If either is not even, the results may not be accurate, though they could be extended to general shapes in the future.
-Because the highest and lowest frequency bins each need only half the coefficients as the other bins, we can pack all the coefficients into 
+Because the highest and lowest frequency bins each need only half the coefficients as the other bins, we can pack all the coefficients into
 the bottom frequency pixel, and retain an Nt by Nf matrix, alternating the lowest and highest frequencies at even and odd time pixels. This packing is why we require the number of time pixels to be even.
 
 
@@ -80,7 +80,7 @@ python inverse_wavelet_freq_time_harness.py filename_wavelet_in filename_time_ou
 ===============Timing===============
 
 The fast transforms are quite efficient. On a single core of an AMD Ryzen Threadripper 3970X
-with the MKL FFT libraries installed, a version of time_tests.py with approximately 8 years 
+with the MKL FFT libraries installed, a version of time_tests.py with approximately 8 years
 of gaussian random noise data sampled at 5s intervals gives the following timings:
 
 dt = 5.0 Nt = 12288 Nf = 4096 mult = 16
@@ -95,7 +95,7 @@ got freq->wavelet in           1.6941847s    7.2436183 X fft time
 got time->wavelet in          15.2326701s   65.1284624 X fft time
 got time->freq->wavelet in     2.1416471s    9.1567782 X fft time
 
-The timing results will depend heavily on the fft library used. 
+The timing results will depend heavily on the fft library used.
 Currently, fft_funcs.py supports either numpy or mkl-fft fft libraries. In our testing, mkl-fft is consistently faster.
 For example, here is a comparison of a run on a single core of the same machine with 6 months of data at 30s intervals with numpy fft:
 
@@ -127,10 +127,10 @@ got time->wavelet in           0.1526154s  133.9205840 X fft time
 got time->freq->wavelet in     0.0153940s   13.5082907 X fft time
 
 all of the transforms are faster with mkl fft, though the improvement does not scale linearly with the time a single fft of the full dataset takes.
-The different timings will be highly architecture dependent. 
-Note that with mult=16, the wavelet->time and time->wavelet transform are approximate, 
+The different timings will be highly architecture dependent.
+Note that with mult=16, the wavelet->time and time->wavelet transform are approximate,
 yet the time->freq->wavelet transform is approximately an order of magnitude faster than the time->wavelet transform, with a similar but smaller
-improvement in the wavelet->freq->time vs wavelet->time transform. 
+improvement in the wavelet->freq->time vs wavelet->time transform.
 To achieve the same accuracy as the wavelet->freq and freq->wavelet transforms, we would need to set mult=Nt/2 (256 in this case),
 in which case we would get timings:
 
@@ -150,5 +150,5 @@ which is approximately two orders of magnitude  slower for the wavelet->time and
 The remaing transform timings differ only due to random timing variation.
 Therefore, for many use cases it is likely preferable to use the time->freq->wavelet and wavelet->freq->time versions of the transforms.
 
-Although numba's just-in-time compilation must occur at runtime, all of the modules compile reasonably fast 
+Although numba's just-in-time compilation must occur at runtime, all of the modules compile reasonably fast
 and compilation time is likely not a significant limiting factor for most applications

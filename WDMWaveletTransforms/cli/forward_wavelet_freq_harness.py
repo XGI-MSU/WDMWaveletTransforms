@@ -3,9 +3,11 @@ write to .dat file in wavelet domain (Nt rows by Nf columns)"""
 
 import sys
 from time import perf_counter
+
 import numpy as np
 
 from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq
+
 
 def main():
     if len(sys.argv)!=6:

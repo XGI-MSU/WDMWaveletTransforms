@@ -1,7 +1,8 @@
 """helper functions for transform_freq"""
 import numpy as np
-from numba import njit
 import scipy.special
+from numba import njit
+
 import WDMWaveletTransforms.fft_funcs as fft
 
 

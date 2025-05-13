@@ -1,13 +1,14 @@
 """"test that both inverse functions perform as specified in stored dat files"""
-from time import perf_counter
-import numpy as np
-
-import pytest
 from pathlib import Path
+from time import perf_counter
 
+import numpy as np
+import pytest
 
-from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
 import WDMWaveletTransforms.fft_funcs as fft
+from WDMWaveletTransforms.wavelet_transforms import (
+    transform_wavelet_freq, transform_wavelet_freq_time,
+    transform_wavelet_time)
 
 EXACT_MATCH = False
 

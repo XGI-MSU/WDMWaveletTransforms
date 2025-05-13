@@ -1,6 +1,6 @@
 """functions for computing the inverse wavelet transforms"""
-from numba import njit
 import numpy as np
+from numba import njit
 
 import WDMWaveletTransforms.fft_funcs as fft
 

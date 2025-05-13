@@ -26,4 +26,3 @@ forward-wavelet-time-harness = "WDMWaveletTransforms.cli.forward_wavelet_time_ha
 inverse-wavelet-freq-harness = "WDMWaveletTransforms.cli.inverse_wavelet_freq_harness:main"
 inverse-wavelet-freq-time-harness = "WDMWaveletTransforms.cli.inverse_wavelet_freq_time_harness:main"
 inverse-wavelet-time-harness = "WDMWaveletTransforms.cli.inverse_wavelet_time_harness:main"
-

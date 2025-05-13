@@ -1,8 +1,9 @@
 """helper functions for transform_time.py"""
 import numpy as np
 from numba import njit
-from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
+
 import WDMWaveletTransforms.fft_funcs as fft
+from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
 
 
 def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):

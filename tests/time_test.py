@@ -1,9 +1,13 @@
 """"test that both inverse functions perform as specified in stored dat files"""
 from time import perf_counter
+
 import numpy as np
 
-from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq,inverse_wavelet_freq_time,inverse_wavelet_time,transform_wavelet_time,transform_wavelet_freq,transform_wavelet_freq_time
 import WDMWaveletTransforms.fft_funcs as fft
+from WDMWaveletTransforms.wavelet_transforms import (
+    inverse_wavelet_freq, inverse_wavelet_freq_time, inverse_wavelet_time,
+    transform_wavelet_freq, transform_wavelet_freq_time,
+    transform_wavelet_time)
 
 if __name__=='__main__':
     #transform parameters

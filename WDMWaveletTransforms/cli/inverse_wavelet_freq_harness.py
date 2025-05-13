@@ -2,9 +2,11 @@
 and write to .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"""
 import sys
 from time import perf_counter
+
 import numpy as np
 
 from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq
+
 
 def main():
     #assume input .dat file is Nt rows by Nf columns
