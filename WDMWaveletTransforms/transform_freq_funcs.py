@@ -7,7 +7,7 @@ import WDMWaveletTransforms.fft_funcs as fft
 
 
 def phitilde_vec(om, Nf, nx=4.):
-    """compute phitilde, om i array, nx is filter steepness, defaults to 4."""
+    """Compute phitilde, om i array, nx is filter steepness, defaults to 4."""
     OM = np.pi   # Nyquist angular frequency
     DOM = OM/Nf  # 2 pi times DF
     insDOM = 1./np.sqrt(DOM)
@@ -26,7 +26,7 @@ def phitilde_vec(om, Nf, nx=4.):
 
 
 def phitilde_vec_norm(Nf, Nt, nx):
-    """normalize phitilde as needed for inverse frequency domain transform"""
+    """Normalize phitilde as needed for inverse frequency domain transform"""
     ND = Nf*Nt
     oms = 2*np.pi/ND*np.arange(0, Nt//2+1)
     phif = phitilde_vec(oms, Nf, nx)
@@ -39,12 +39,12 @@ def phitilde_vec_norm(Nf, Nt, nx):
 
 @njit()
 def tukey(data, alpha, N):
-    """apply tukey window function to data"""
+    """Apply tukey window function to data"""
     imin = np.int64(alpha*(N-1)/2)
     imax = np.int64((N-1)*(1-alpha/2))
     Nwin = N-imax
 
-    for i in range(0, N):
+    for i in range(N):
         f_mult = 1.0
         if i < imin:
             f_mult = 0.5*(1.+np.cos(np.pi*(i/imin-1.)))
@@ -55,7 +55,7 @@ def tukey(data, alpha, N):
 
 @njit()
 def DX_assign_loop(m, Nt, Nf, DX, data, phif):
-    """helper for assigning DX in the main loop"""
+    """Helper for assigning DX in the main loop"""
     i_base = Nt//2
     jj_base = m*Nt//2
 
@@ -82,7 +82,7 @@ def DX_assign_loop(m, Nt, Nf, DX, data, phif):
 
 @njit()
 def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
-    """helper for unpacking fftd DX in main loop"""
+    """Helper for unpacking fftd DX in main loop"""
     if m == 0:
         # half of lowest and highest frequency bin pixels are redundant
         # so store them in even and odd components of m=0 respectively
@@ -92,7 +92,7 @@ def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
         for n in range(0, Nt, 2):
             wave[n+1, 0] = np.real(DX_trans[n]*np.sqrt(2))
     else:
-        for n in range(0, Nt):
+        for n in range(Nt):
             if m % 2:
                 if (n+m) % 2:
                     wave[n, m] = -np.imag(DX_trans[n])
@@ -106,11 +106,11 @@ def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
 
 
 def transform_wavelet_freq_helper(data, Nf, Nt, phif):
-    """helper to do the wavelet transform using the fast wavelet domain transform"""
+    """Helper to do the wavelet transform using the fast wavelet domain transform"""
     wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
 
     DX = np.zeros(Nt, dtype=np.complex128)
-    for m in range(0, Nf+1):
+    for m in range(Nf+1):
         DX_assign_loop(m, Nt, Nf, DX, data, phif)
         DX_trans = fft.ifft(DX, Nt)
         DX_unpack_loop(m, Nt, Nf, DX_trans, wave)

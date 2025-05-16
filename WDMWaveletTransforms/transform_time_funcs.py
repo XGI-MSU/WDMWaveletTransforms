@@ -8,14 +8,14 @@ from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
 
 @njit()
 def assign_wdata(i, K, ND, Nf, wdata, data_pad, phi):
-    """assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
+    """Assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
     # half_K = np.int64(K/2)
     jj = i*Nf-K//2
     if jj < 0:
         jj += ND  # periodically wrap the data
     if jj >= ND:
         jj -= ND  # periodically wrap the data
-    for j in range(0, K):
+    for j in range(K):
         # jj = i*Nf-half_K+j
         wdata[j] = data_pad[jj]*phi[j]  # apply the window
         jj += 1
@@ -25,7 +25,7 @@ def assign_wdata(i, K, ND, Nf, wdata, data_pad, phi):
 
 @njit()
 def pack_wave(i, mult, Nf, wdata_trans, wave):
-    """pack fftd wdata into wave array"""
+    """Pack fftd wdata into wave array"""
     if i % 2 == 0 and i < wave.shape[0]-1:
         # m=0 value at even Nt and
         wave[i, 0] = np.real(wdata_trans[0])/np.sqrt(2)
@@ -39,7 +39,7 @@ def pack_wave(i, mult, Nf, wdata_trans, wave):
 
 
 def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
-    """helper function do do the wavelet transform in the time domain"""
+    """Helper function do do the wavelet transform in the time domain"""
     # the time domain data stream
     ND = Nf*Nt
 
@@ -56,7 +56,7 @@ def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
     data_pad[:ND] = data
     data_pad[ND:ND+K] = data[:K]
 
-    for i in range(0, Nt):
+    for i in range(Nt):
         assign_wdata(i, K, ND, Nf, wdata, data_pad, phi)
         wdata_trans = fft.rfft(wdata, K)
         pack_wave(i, mult, Nf, wdata_trans, wave)
@@ -65,7 +65,7 @@ def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
 
 
 def phi_vec(Nf, nx=4., mult=16):
-    """get time domain phi as fourier transform of phitilde_vec"""
+    """Get time domain phi as fourier transform of phitilde_vec"""
     # TODO fix mult
 
     OM = np.pi

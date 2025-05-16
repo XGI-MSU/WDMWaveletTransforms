@@ -4,10 +4,7 @@ from time import perf_counter
 import numpy as np
 
 import WDMWaveletTransforms.fft_funcs as fft
-from WDMWaveletTransforms.wavelet_transforms import (
-    inverse_wavelet_freq, inverse_wavelet_freq_time, inverse_wavelet_time,
-    transform_wavelet_freq, transform_wavelet_freq_time,
-    transform_wavelet_time)
+from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq, inverse_wavelet_freq_time, inverse_wavelet_time, transform_wavelet_freq, transform_wavelet_freq_time, transform_wavelet_time
 
 if __name__=='__main__':
     #transform parameters
@@ -41,7 +38,7 @@ if __name__=='__main__':
 
     n_run = 1000
     t6 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         fft.rfft(signal_time)
     t7 = perf_counter()
 
@@ -53,7 +50,7 @@ if __name__=='__main__':
 
     n_run = 1000
     t2 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         fft.irfft(signal_freq)
     t3 = perf_counter()
 
@@ -61,7 +58,7 @@ if __name__=='__main__':
 
     n_run = 100
     t0 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         inverse_wavelet_freq(wave_in,Nf,Nt,dt)
     t1 = perf_counter()
 
@@ -71,7 +68,7 @@ if __name__=='__main__':
 
     n_run = 100
     t4 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         inverse_wavelet_time(wave_in,Nf,Nt,dt,mult=mult)
     t5 = perf_counter()
 
@@ -81,7 +78,7 @@ if __name__=='__main__':
 
     n_run = 100
     t8 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         inverse_wavelet_freq_time(wave_in,Nf,Nt,dt)
     t9 = perf_counter()
 
@@ -91,7 +88,7 @@ if __name__=='__main__':
 
     n_run = 100
     t10 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         transform_wavelet_freq(signal_freq,Nf,Nt,dt)
     t11 = perf_counter()
 
@@ -101,7 +98,7 @@ if __name__=='__main__':
 
     n_run = 100
     t12 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         transform_wavelet_time(signal_time,Nf,Nt,dt,mult=mult)
     t13 = perf_counter()
 
@@ -111,7 +108,7 @@ if __name__=='__main__':
 
     n_run = 100
     t14 = perf_counter()
-    for itrm in range(n_run):
+    for _itrm in range(n_run):
         transform_wavelet_freq_time(signal_time,Nf,Nt,dt)
     t15 = perf_counter()
 

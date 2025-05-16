@@ -1,5 +1,6 @@
 """"harness for computing forward time domain wavelet transform via fft, take input .dat file in time domain (columns ftime, h(t)"
-write to .dat file in wavelet domain (Nt rows by Nf columns)"""
+write to .dat file in wavelet domain (Nt rows by Nf columns)
+"""
 
 import sys
 from time import perf_counter
@@ -21,7 +22,7 @@ def main():
     dt = np.float64(sys.argv[3])
     Nt = np.int64(sys.argv[4])
     Nf = np.int64(sys.argv[5])
-    mult = np.int64(sys.argv[5])
+    np.int64(sys.argv[5])
 
     print('begin loading data file')
     t0 = perf_counter()
@@ -31,7 +32,7 @@ def main():
     print('loaded input file in %5.3fs'%(t1-t0))
 
     ND = Nt*Nf
-    Tobs = dt*ND
+    dt*ND
 
     #time and frequency grids
     ts = dt*np.arange(0,ND)

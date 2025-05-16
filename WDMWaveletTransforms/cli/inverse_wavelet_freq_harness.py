@@ -1,5 +1,6 @@
 """"harness for computing inverse frequency domain wavelet transform, take input .dat file in wavelet domain (Nt rows by Nf columns)
-and write to .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"""
+and write to .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))
+"""
 import sys
 from time import perf_counter
 
@@ -34,7 +35,7 @@ def main():
     Tobs = dt*ND
 
     #time and frequency grids
-    ts = np.arange(0,ND)*dt
+    np.arange(0,ND)*dt
     fs = np.arange(0,ND//2+1)*1/(Tobs)
 
 

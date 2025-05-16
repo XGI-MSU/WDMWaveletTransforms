@@ -6,16 +6,15 @@ import numpy as np
 import pytest
 
 import WDMWaveletTransforms.fft_funcs as fft
-from WDMWaveletTransforms.wavelet_transforms import (inverse_wavelet_freq,
-                                                     inverse_wavelet_freq_time,
-                                                     inverse_wavelet_time)
+from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq, inverse_wavelet_freq_time, inverse_wavelet_time
 
 #whether to expect exact match for input files
 EXACT_MATCH = False
 
 def test_inverse_wavelets():
-    """test that inverse wavelet transforms perform precisely as recorded in the input dat files
-    for random input data"""
+    """Test that inverse wavelet transforms perform precisely as recorded in the input dat files
+    for random input data
+    """
     #transform parameters
     file_wave = Path(__file__).parent / "data" / "rand_wavelet.dat"
     file_freq = Path(__file__).parent / "data" / "rand_wave_freq.dat"

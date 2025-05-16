@@ -1,5 +1,6 @@
 """"harness for computing forward frequency domain wavelet transform, take input .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"
-write to .dat file in wavelet domain (Nt rows by Nf columns)"""
+write to .dat file in wavelet domain (Nt rows by Nf columns)
+"""
 
 import sys
 from time import perf_counter

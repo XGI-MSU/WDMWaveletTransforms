@@ -8,7 +8,7 @@ import pytest
 EXACT_MATCH = False
 
 def test_harness_writes():
-    """test that the command line harnesses match expected results"""
+    """Test that the command line harnesses match expected results"""
     filename_wavelet_in = Path(__file__).parent / "data" / "rand_wavelet.dat"
     filename_freq_in = Path(__file__).parent / "data" / "rand_wave_freq.dat"
     filename_time_in = Path(__file__).parent / "data" / "rand_wave_time.dat"
@@ -80,12 +80,12 @@ def test_harness_writes():
         assert np.allclose(fw_in,fw_out,atol=1.e-13,rtol=1.e-13)
         assert np.allclose(tw_in,tw_out,atol=1.e-13,rtol=1.e-13)
 
-    os.remove(filename_fw_out)
-    os.remove(filename_tw_out)
-    os.remove(filename_tfw_out)
-    os.remove(filename_wf_out)
-    os.remove(filename_wt_out)
-    os.remove(filename_wft_out)
+    Path.unlink(filename_fw_out)
+    Path.unlink(filename_tw_out)
+    Path.unlink(filename_tfw_out)
+    Path.unlink(filename_wf_out)
+    Path.unlink(filename_wt_out)
+    Path.unlink(filename_wft_out)
 
 if __name__=='__main__':
     pytest.cmdline.main(['run_harness_tests.py'])
