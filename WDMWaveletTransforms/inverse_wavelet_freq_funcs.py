@@ -7,24 +7,24 @@ import WDMWaveletTransforms.fft_funcs as fft
 
 
 @njit()
-def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.floating], fft_prefactor2s: NDArray[np.complexfloating], res: NDArray[np.complexfloating]) -> None:
+def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.float64], fft_prefactor2s: NDArray[np.complex128], res: NDArray[np.complex128]) -> None:
     """Helper for unpacking results of frequency domain inverse transform"""
     if m in (0, Nf):
-        for i_ind in range(Nt//2):
-            i = np.abs(m*Nt//2-i_ind)  # i_off+i_min2
+        for i_ind in range(int(Nt//2)):
+            i = int(np.abs(m*int(Nt//2)-i_ind))  # i_off+i_min2
             ind3 = (2*i) % Nt
             res[i] += fft_prefactor2s[ind3]*phif[i_ind]
         if m == Nf:
-            i_ind = Nt//2
-            i = np.abs(m*Nt//2-i_ind)  # i_off+i_min2
+            i_ind = int(Nt//2)
+            i = int(np.abs(m*int(Nt//2)-i_ind))  # i_off+i_min2
             ind3 = 0
             res[i] += fft_prefactor2s[ind3]*phif[i_ind]
     else:
-        ind31 = (Nt//2*m) % Nt
-        ind32 = (Nt//2*m) % Nt
-        for i_ind in range(Nt//2):
-            i1 = Nt//2*m-i_ind
-            i2 = Nt//2*m+i_ind
+        ind31 = (int(Nt//2)*m) % Nt
+        ind32 = (int(Nt//2)*m) % Nt
+        for i_ind in range(int(Nt//2)):
+            i1 = int(Nt//2)*m-i_ind
+            i2 = int(Nt//2)*m+i_ind
             # assert ind31 == i1 % Nt
             # assert ind32 == i2 % Nt
             res[i1] += fft_prefactor2s[ind31]*phif[i_ind]
@@ -57,7 +57,7 @@ def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.floating], ff
 
 
 @njit()
-def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex128], wave_in: NDArray[np.floating]) -> None:
+def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex128], wave_in: NDArray[np.float64]) -> None:
     """Helper for fast frequency domain inverse transform to prepare for fourier transform"""
     if m == 0:
         for n in range(Nt):
@@ -67,7 +67,7 @@ def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex1
             prefactor2s[n] = 1/np.sqrt(2)*wave_in[(2*n) % Nt+1, 0]
     else:
         for n in range(Nt):
-            val = wave_in[n, m]
+            val = float(wave_in[n, m])
             if (n+m) % 2:
                 mult2 = -1j
             else:
@@ -77,7 +77,7 @@ def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex1
 
 
 # @njit()
-def inverse_wavelet_freq_helper_fast(wave_in: NDArray[np.floating], phif: NDArray[np.floating], Nf: int, Nt: int) -> NDArray[np.complexfloating]:
+def inverse_wavelet_freq_helper_fast(wave_in: NDArray[np.float64], phif: NDArray[np.float64], Nf: int, Nt: int) -> NDArray[np.complex128]:
     """Jit compatible loop for inverse_wavelet_freq"""
     ND = Nf*Nt
 

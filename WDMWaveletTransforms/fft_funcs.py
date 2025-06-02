@@ -15,16 +15,16 @@ if TYPE_CHECKING:
 
 
 # ----- rfft -----
-def rfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complexfloating]: # type: ignore [empty-body]
+def rfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
     ...
 # ----- irfft -----
-def irfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.floating]: # type: ignore [empty-body]
+def irfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.float64]: # type: ignore [empty-body]
     ...
 # ----- fft -----
-def fft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complexfloating]: # type: ignore [empty-body]
+def fft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
     ...
 # ----- ifft -----
-def ifft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complexfloating]: # type: ignore [empty-body]
+def ifft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
     ...
 
 try:

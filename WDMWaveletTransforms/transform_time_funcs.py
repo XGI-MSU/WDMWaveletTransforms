@@ -1,4 +1,5 @@
 """helper functions for transform_time.py"""
+
 import numpy as np
 from numba import njit
 from numpy.typing import NDArray
@@ -8,8 +9,12 @@ from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
 
 
 @njit()
-def assign_wdata(i: int, K: int, ND: int, Nf: int, wdata: NDArray[np.floating], data_pad: NDArray[np.floating], phi: NDArray[np.floating]) -> None:
+def assign_wdata(i: int, K: int, ND: int, Nf: int, wdata: NDArray[np.float64], data_pad: NDArray[np.float64], phi: NDArray[np.float64]) -> None:
     """Assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
+    assert len(wdata.shape) == 1, 'Input data array must be 1D'
+    assert len(data_pad.shape) == 1, 'Input data array must be 1D'
+    assert len(data_pad.shape) == 1, 'Input phi array must be 1D'
+
     # half_K = np.int64(K/2)
     jj = i*Nf-K//2
     if jj < 0:
@@ -25,21 +30,25 @@ def assign_wdata(i: int, K: int, ND: int, Nf: int, wdata: NDArray[np.floating], 
 
 
 @njit()
-def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complexfloating], wave: NDArray[np.floating]) -> None:
+def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complex128], wave: NDArray[np.float64]) -> None:
     """Pack fftd wdata into wave array"""
+    assert len(wdata_trans.shape) == 1, 'Input data array must be 1D'
+    assert wdata_trans.size == Nf*mult + 1, 'Input array must have size Nf*mult+1'
+    assert len(wave.shape) == 2, 'Wave array must be 2D'
+
     if i % 2 == 0 and i < wave.shape[0]-1:
         # m=0 value at even Nt and
-        wave[i, 0] = np.real(wdata_trans[0])/np.sqrt(2)
-        wave[i+1, 0] = np.real(wdata_trans[Nf*mult])/np.sqrt(2)
+        wave[i, 0] = wdata_trans[0].real/np.sqrt(2)
+        wave[i+1, 0] = wdata_trans[Nf*mult].real/np.sqrt(2)
 
     for j in range(1, Nf):
         if (i+j) % 2:
-            wave[i, j] = -np.imag(wdata_trans[j*mult])
+            wave[i, j] = -wdata_trans[j*mult].imag
         else:
-            wave[i, j] = np.real(wdata_trans[j*mult])
+            wave[i, j] = wdata_trans[j*mult].real
 
 
-def transform_wavelet_time_helper(data: NDArray[np.floating], Nf: int, Nt: int, phi: NDArray[np.floating], mult: int) -> NDArray[np.floating]:
+def transform_wavelet_time_helper(data: NDArray[np.float64], Nf: int, Nt: int, phi: NDArray[np.float64], mult: int) -> NDArray[np.float64]:
     """Helper function do do the wavelet transform in the time domain"""
     # the time domain data stream
     ND = Nf*Nt
@@ -65,7 +74,7 @@ def transform_wavelet_time_helper(data: NDArray[np.floating], Nf: int, Nt: int, 
     return wave
 
 
-def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
+def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.float64]:
     """Get time domain phi as fourier transform of phitilde_vec"""
     # TODO fix mult
 
@@ -75,7 +84,7 @@ def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
     K: int= int(mult*2*Nf)
     half_K: int = int(mult*Nf)  # np.int64(K/2)
 
-    dom: float = float(2*np.pi/K)  # max frequency is K/2*dom = pi/dt = OM
+    dom: np.float64 = np.float64(2*np.pi/K)  # max frequency is K/2*dom = pi/dt = OM
 
     phitilde_loc = np.zeros(K, dtype=np.complex128)
 
@@ -97,5 +106,4 @@ def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
     nrm: float = float(np.sqrt(K/dom))  # *np.linalg.norm(phi)
 
     fac: float = float(float(np.sqrt(2.0))/nrm)
-    phi *= fac
-    return phi
+    return phi * fac

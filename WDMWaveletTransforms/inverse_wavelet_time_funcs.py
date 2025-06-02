@@ -7,7 +7,7 @@ import WDMWaveletTransforms.fft_funcs as fft
 
 
 @njit()
-def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDArray[np.floating], fft_fin: NDArray[np.complexfloating], res: NDArray[np.floating]) -> None:
+def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDArray[np.float64], fft_fin: NDArray[np.complex128], res: NDArray[np.float64]) -> None:
     """Helper for time domain wavelet transform to unpack wavelet domain coefficients
     in compact representation where cosine and sine parts are real and imaginary parts
     """
@@ -15,9 +15,9 @@ def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDAr
     fft_fin_real = np.zeros(4*Nf)
     fft_fin_imag = np.zeros(4*Nf)
     for itrf in range(2*Nf):
-        fft_fin_real[itrf] = np.real(fft_fin[itrf])
+        fft_fin_real[itrf] = fft_fin[itrf].real
         fft_fin_real[itrf+2*Nf] = fft_fin_real[itrf]
-        fft_fin_imag[itrf] = np.imag(fft_fin[(itrf+Nf) % (2*Nf)])
+        fft_fin_imag[itrf] = fft_fin[(itrf+Nf) % (2*Nf)].imag
         fft_fin_imag[itrf+2*Nf] = fft_fin_imag[itrf]
 
     idxf1_base = (-K//2+n*Nf+ND) % (2*Nf)
@@ -33,7 +33,7 @@ def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDAr
 
 
 @njit()
-def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.complexfloating]) -> None:
+def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.float64], afins: NDArray[np.complex128]) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients
     in packed representation with odd and even coefficients in real and imaginary pars
     """
@@ -52,7 +52,7 @@ def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.
     afins[Nf+1] = -1j*(wave_in[n, Nf-1]+wave_in[n+1, Nf-1])
 
 
-def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray[np.floating], Nf: int, Nt: int, mult: int) -> NDArray[np.floating]:
+def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.float64], phi: NDArray[np.float64], Nf: int, Nt: int, mult: int) -> NDArray[np.float64]:
     """Helper loop for fast inverse wavelet transform"""
     ND = Nf*Nt
     K = mult*2*Nf
