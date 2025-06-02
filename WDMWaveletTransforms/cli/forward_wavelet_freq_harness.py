@@ -20,8 +20,8 @@ def main():
     file_out = sys.argv[2]
 
     dt = np.float64(sys.argv[3])
-    Nt = np.int64(sys.argv[4])
-    Nf = np.int64(sys.argv[5])
+    Nt = int(sys.argv[4])
+    Nf = int(sys.argv[5])
 
     print('begin loading data file')
     t0 = perf_counter()

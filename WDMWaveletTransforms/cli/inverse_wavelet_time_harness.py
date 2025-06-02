@@ -18,7 +18,7 @@ def main():
     file_in = sys.argv[1]
     file_out = sys.argv[2]
     dt = np.float64(sys.argv[3])
-    mult = np.int64(sys.argv[4])
+    mult = int(sys.argv[4])
 
     print('begin loading data file')
     t0 = perf_counter()
@@ -30,7 +30,6 @@ def main():
     Nf = wave_in.shape[1]
 
     ND = Nt*Nf
-    dt*ND
 
     #time and frequency grids
     ts = np.arange(0, ND)*dt

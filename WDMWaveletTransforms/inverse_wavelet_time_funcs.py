@@ -33,7 +33,7 @@ def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDAr
 
 
 @njit()
-def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.floating]) -> None:
+def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.complexfloating]) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients
     in packed representation with odd and even coefficients in real and imaginary pars
     """

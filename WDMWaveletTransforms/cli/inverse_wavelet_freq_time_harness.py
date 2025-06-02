@@ -29,7 +29,6 @@ def main():
     Nf = wave_in.shape[1]
 
     ND = Nt*Nf
-    dt*ND
 
     #time and frequency grids
     ts = np.arange(0,ND)*dt

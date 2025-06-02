@@ -57,7 +57,7 @@ def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.floating], ff
 
 
 @njit()
-def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.floating], wave_in: NDArray[np.floating]) -> None:
+def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex128], wave_in: NDArray[np.floating]) -> None:
     """Helper for fast frequency domain inverse transform to prepare for fourier transform"""
     if m == 0:
         for n in range(Nt):

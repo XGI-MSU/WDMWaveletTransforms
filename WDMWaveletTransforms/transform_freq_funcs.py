@@ -61,7 +61,7 @@ def tukey(data: NDArray[np.floating | np.complexfloating], alpha: float, N: int)
 
 
 @njit()
-def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], data: NDArray[np.floating], phif: NDArray[np.floating]) -> None:
+def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], data: NDArray[np.complexfloating], phif: NDArray[np.floating]) -> None:
     """Helper for assigning DX in the main loop"""
     i_base = Nt//2
     jj_base = m*Nt//2

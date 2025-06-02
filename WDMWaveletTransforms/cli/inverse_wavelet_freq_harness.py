@@ -35,7 +35,6 @@ def main():
     Tobs = dt*ND
 
     #time and frequency grids
-    np.arange(0,ND)*dt
     fs = np.arange(0,ND//2+1)*1/(Tobs)
 
 
