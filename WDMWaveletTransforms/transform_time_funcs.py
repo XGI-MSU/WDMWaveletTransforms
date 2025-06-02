@@ -70,31 +70,32 @@ def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
     # TODO fix mult
 
     OM = np.pi
-    DOM = OM/Nf
-    insDOM = 1./np.sqrt(DOM)
-    K = mult*2*Nf
-    half_K = mult*Nf  # np.int64(K/2)
+    DOM = float(OM/Nf)
+    insDOM = float(1./np.sqrt(DOM))
+    K = int(mult*2*Nf)
+    half_K = int(mult*Nf)  # np.int64(K/2)
 
-    dom = 2*np.pi/K  # max frequency is K/2*dom = pi/dt = OM
+    dom = float(2*np.pi/K)  # max frequency is K/2*dom = pi/dt = OM
 
-    DX = np.zeros(K, dtype=np.complex128)
+    phitilde_loc = np.zeros(K, dtype=np.complex128)
 
     # zero frequency
-    DX[0] = insDOM
+    phitilde_loc[0] = insDOM
 
-    DX = DX.copy()
     # postive frequencies
-    DX[1:half_K+1] = phitilde_vec(dom*np.arange(1, half_K+1), Nf, nx)
+    phitilde_loc[1:half_K+1] = phitilde_vec(dom*np.arange(1, half_K+1), Nf, nx)
     # negative frequencies
-    DX[half_K+1:] = phitilde_vec(-dom*np.arange(half_K-1, 0, -1), Nf, nx)
-    DX = K*fft.ifft(DX, K)
+    phitilde_loc[half_K+1:] = phitilde_vec(-dom*np.arange(half_K-1, 0, -1), Nf, nx)
+    phi_loc  = K*fft.ifft(phitilde_loc, K)
 
-    phi = np.zeros(K)
-    phi[0:half_K] = np.real(DX[half_K:K])
-    phi[half_K:] = np.real(DX[0:half_K])
+    del phitilde_loc
 
-    nrm = np.sqrt(K/dom)  # *np.linalg.norm(phi)
+    phi = np.zeros(K, dtype=np.float64)
+    phi[0:half_K] = np.real(phi_loc[half_K:K])
+    phi[half_K:] = np.real(phi_loc[0:half_K])
 
-    fac = np.sqrt(2.0)/nrm
+    nrm: float = float(np.sqrt(K/dom))  # *np.linalg.norm(phi)
+
+    fac: float = float(float(np.sqrt(2.0))/nrm)
     phi *= fac
     return phi
