@@ -69,13 +69,13 @@ def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
     """Get time domain phi as fourier transform of phitilde_vec"""
     # TODO fix mult
 
-    OM = np.pi
+    OM: float = np.pi
     DOM = float(OM/Nf)
-    insDOM = float(1./np.sqrt(DOM))
-    K = int(mult*2*Nf)
-    half_K = int(mult*Nf)  # np.int64(K/2)
+    insDOM: float = float(1./np.sqrt(DOM))
+    K: int= int(mult*2*Nf)
+    half_K: int = int(mult*Nf)  # np.int64(K/2)
 
-    dom = float(2*np.pi/K)  # max frequency is K/2*dom = pi/dt = OM
+    dom: float = float(2*np.pi/K)  # max frequency is K/2*dom = pi/dt = OM
 
     phitilde_loc = np.zeros(K, dtype=np.complex128)
 

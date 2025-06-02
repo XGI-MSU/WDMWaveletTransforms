@@ -34,11 +34,11 @@ def phitilde_vec(om: NDArray[np.floating], Nf: int, nx: float=4.) -> NDArray[np.
 
 def phitilde_vec_norm(Nf: int, Nt: int, nx: float) -> NDArray[np.floating]:
     """Normalize phitilde as needed for inverse frequency domain transform"""
-    ND = Nf*Nt
-    oms = 2*np.pi/ND*np.arange(0, Nt//2+1)
-    phif = phitilde_vec(oms, Nf, nx)
+    ND: int = Nf*Nt
+    oms: NDArray[np.floating] = 2*np.pi/ND*np.arange(0, Nt//2+1)
+    phif: NDArray[np.floating] = phitilde_vec(oms, Nf, nx)
     # nrm should be 1
-    nrm = np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/ND)
+    nrm: float = float(np.sqrt((2*np.sum(phif[1:]**2)+phif[0]**2)*2*np.pi/ND))
     nrm /= np.pi**(3/2)/np.pi
     phif /= nrm
     return phif
@@ -47,24 +47,24 @@ def phitilde_vec_norm(Nf: int, Nt: int, nx: float) -> NDArray[np.floating]:
 @njit()
 def tukey(data: NDArray[np.floating | np.complexfloating], alpha: float, N: int) -> None:
     """Apply tukey window function to data"""
-    imin = np.int64(alpha*(N-1)/2)
-    imax = np.int64((N-1)*(1-alpha/2))
-    Nwin = N-imax
+    imin: int = int(alpha*(N-1)/2)
+    imax: int = int((N-1)*(1-alpha/2))
+    Nwin: int = N-imax
 
     for i in range(N):
-        f_mult = 1.0
+        f_mult: float = 1.0
         if i < imin:
-            f_mult = 0.5*(1.+np.cos(np.pi*(i/imin-1.)))
+            f_mult = float(0.5*(1.+np.cos(np.pi*(i/imin-1.))))
         if i > imax:
-            f_mult = 0.5*(1.+np.cos(np.pi/Nwin*(i-imax)))
+            f_mult = float(0.5*(1.+np.cos(np.pi/Nwin*(i-imax))))
         data[i] *= f_mult
 
 
 @njit()
 def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], data: NDArray[np.complexfloating], phif: NDArray[np.floating]) -> None:
     """Helper for assigning DX in the main loop"""
-    i_base = Nt//2
-    jj_base = m*Nt//2
+    i_base: int = int(Nt//2)
+    jj_base: int = int(m*Nt//2)
 
     if m == 0 or m == Nf:
         # NOTE this term appears to be needed to recover correct constant (at least for m=0) but was previously missing
@@ -73,8 +73,8 @@ def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], da
         DX[Nt//2] = phif[0]*data[m*Nt//2]
 
     for jj in range(jj_base+1-Nt//2, jj_base+Nt//2):
-        j = np.abs(jj-jj_base)
-        i = i_base-jj_base+jj
+        j: int = int(np.abs(jj-jj_base))
+        i: int = i_base-jj_base+jj
         if (m == Nf and jj > jj_base) or (m == 0 and jj < jj_base):
             DX[i] = 0.
         elif j == 0:

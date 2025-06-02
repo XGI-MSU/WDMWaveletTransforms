@@ -9,6 +9,16 @@ from WDMWaveletTransforms.inverse_wavelet_time_funcs import inverse_wavelet_time
 from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec_norm, transform_wavelet_freq_helper
 from WDMWaveletTransforms.transform_time_funcs import phi_vec, transform_wavelet_time_helper
 
+__all__ = [
+    'inverse_wavelet_freq',
+    'inverse_wavelet_freq_time',
+    'inverse_wavelet_time',
+    'transform_wavelet_freq',
+    'transform_wavelet_freq_time',
+    'transform_wavelet_time',
+]
+
+
 
 def inverse_wavelet_time(wave_in: NDArray[np.floating], Nf: int, Nt: int, nx: float=4., mult: int=32) -> NDArray[np.floating]:
     """Fast inverse wavelet transform to time domain"""
