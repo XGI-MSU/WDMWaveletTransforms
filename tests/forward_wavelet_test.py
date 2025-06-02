@@ -6,7 +6,11 @@ import numpy as np
 import pytest
 
 import WDMWaveletTransforms.fft_funcs as fft
-from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq, transform_wavelet_freq_time, transform_wavelet_time
+from WDMWaveletTransforms.wavelet_transforms import (
+    transform_wavelet_freq,
+    transform_wavelet_freq_time,
+    transform_wavelet_time,
+)
 
 EXACT_MATCH = False
 
