@@ -66,7 +66,7 @@ def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], da
     i_base: int = int(Nt//2)
     jj_base: int = int(m*Nt//2)
 
-    if m == 0 or m == Nf:
+    if m in (0, Nf):
         # NOTE this term appears to be needed to recover correct constant (at least for m=0) but was previously missing
         DX[Nt//2] = phif[0]*data[m*Nt//2]/2.
     else:
@@ -101,11 +101,10 @@ def DX_unpack_loop(m: int, Nt: int, Nf: int, DX_trans: NDArray[np.complexfloatin
                     wave[n, m] = -np.imag(DX_trans[n])
                 else:
                     wave[n, m] = np.real(DX_trans[n])
+            elif (n+m) % 2:
+                wave[n, m] = np.imag(DX_trans[n])
             else:
-                if (n+m) % 2:
-                    wave[n, m] = np.imag(DX_trans[n])
-                else:
-                    wave[n, m] = np.real(DX_trans[n])
+                wave[n, m] = np.real(DX_trans[n])
 
 
 def transform_wavelet_freq_helper(data: NDArray[np.complexfloating], Nf: int, Nt: int, phif: NDArray[np.floating]) -> NDArray[np.floating]:

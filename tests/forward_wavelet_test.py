@@ -10,7 +10,7 @@ from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq, tran
 
 EXACT_MATCH = False
 
-def test_inverse_wavelets():
+def test_inverse_wavelets() -> None:
     """Test that forward wavelet transforms perform precisely as recorded in the input dat files
     for random input data
     """

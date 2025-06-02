@@ -9,7 +9,7 @@ import WDMWaveletTransforms.fft_funcs as fft
 @njit()
 def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.floating], fft_prefactor2s: NDArray[np.complexfloating], res: NDArray[np.complexfloating]) -> None:
     """Helper for unpacking results of frequency domain inverse transform"""
-    if m == 0 or m == Nf:
+    if m in (0, Nf):
         for i_ind in range(Nt//2):
             i = np.abs(m*Nt//2-i_ind)  # i_off+i_min2
             ind3 = (2*i) % Nt

@@ -10,7 +10,7 @@ import numpy as np
 from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time
 
 
-def main():
+def main() -> None:
     if len(sys.argv)!=7:
         print('forward_wavelet_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf mult')
         sys.exit(1)

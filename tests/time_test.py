@@ -12,6 +12,7 @@ if __name__=='__main__':
     Nt = 512
     Nf = 1024
     mult = 16
+    seed = 314159265
 
     ND = Nt*Nf
     Tobs = dt*ND
@@ -26,7 +27,8 @@ if __name__=='__main__':
     t0 = perf_counter()
 
     #the initial data
-    signal_time = np.random.normal(0.,1.,ND)
+    rng = np.random.default_rng(seed)
+    signal_time = rng.normal(0.,1.,ND)
     signal_freq = fft.rfft(signal_time)
     wave_in = transform_wavelet_freq(signal_freq,Nf,Nt,dt)
 

@@ -34,10 +34,8 @@ try:
     irfft = mkl_fft.irfft_numpy  # type: ignore[assignment]
     fft = mkl_fft.fft  # type: ignore[assignment]
     ifft = mkl_fft.ifft  # type: ignore[assignment]
-    print('WDMWaveletTransforms: using mkl fft')
 except ImportError:
     rfft = np.fft.rfft  # type: ignore[no-redef,assignment]
     irfft = np.fft.irfft  # type: ignore[no-redef,assignment]
     fft = np.fft.fft  # type: ignore[no-redef,assignment]
     ifft = np.fft.ifft  # type: ignore[no-redef,assignment]
-    print('WDMWaveletTransforms: using numpy fft')

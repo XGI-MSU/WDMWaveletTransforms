@@ -9,7 +9,7 @@ import numpy as np
 from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq
 
 
-def main():
+def main() -> None:
     #assume input .dat file is Nt rows by Nf columns
     if len(sys.argv)!=4:
         print('inverse_wavelet_freq_harness.py filename_wavelet_in filename_freq_out dt')

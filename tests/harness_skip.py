@@ -7,7 +7,7 @@ import pytest
 
 EXACT_MATCH = False
 
-def test_harness_writes():
+def test_harness_writes() -> None:
     """Test that the command line harnesses match expected results"""
     filename_wavelet_in = Path(__file__).parent / 'data' / 'rand_wavelet.dat'
     filename_freq_in = Path(__file__).parent / 'data' / 'rand_wave_freq.dat'
