@@ -12,7 +12,7 @@ from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_time
 def main():
     #assume input .dat file is Nt rows by Nf columns
     if len(sys.argv)!=5:
-        print("inverse_wavelet_time_harness.py filename_wavelet_in filename_time_out dt mult")
+        print('inverse_wavelet_time_harness.py filename_wavelet_in filename_time_out dt mult')
         sys.exit(1)
 
     file_in = sys.argv[1]

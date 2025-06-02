@@ -59,7 +59,7 @@ def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray
     # res = np.zeros(ND)
 
     # extend this array, we can use wrapping boundary conditions at end
-    res = np.zeros(ND+K+Nf)
+    res: NDArray[np.float64] = np.zeros(ND+K+Nf, dtype=np.float64)
 
     afins = np.zeros(2*Nf, dtype=np.complex128)
 
@@ -77,6 +77,4 @@ def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray
     if K+Nf > ND:
         res[:K+Nf-ND] += res[2*ND:ND+K*Nf]
 
-    res = res[:ND]
-
-    return res
+    return np.asarray(res[:ND], dtype=np.float64)

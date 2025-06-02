@@ -12,7 +12,7 @@ from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_freq
 
 def main():
     if len(sys.argv)!=6:
-        print("forward_wavelet_freq_harness.py filename_freq_in filename_wavelet_out dt Nt Nf")
+        print('forward_wavelet_freq_harness.py filename_freq_in filename_wavelet_out dt Nt Nf')
         sys.exit(1)
 
     #transform parameters

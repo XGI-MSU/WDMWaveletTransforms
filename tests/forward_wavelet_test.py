@@ -14,12 +14,12 @@ def test_inverse_wavelets():
     """Test that forward wavelet transforms perform precisely as recorded in the input dat files
     for random input data
     """
-    file_freq = Path(__file__).parent / "data" / "rand_wave_freq.dat"
-    file_time = Path(__file__).parent / "data" / "rand_wave_time.dat"
+    file_freq = Path(__file__).parent / 'data' / 'rand_wave_freq.dat'
+    file_time = Path(__file__).parent / 'data' / 'rand_wave_time.dat'
 
-    file_wave = Path(__file__).parent / "data" / "rand_wavelet.dat"
-    file_wave_freq = Path(__file__).parent / "data" / "rand_wavelet_freq.dat"
-    file_wave_time = Path(__file__).parent / "data" / "rand_wavelet_time.dat"
+    file_wave = Path(__file__).parent / 'data' / 'rand_wavelet.dat'
+    file_wave_freq = Path(__file__).parent / 'data' / 'rand_wavelet_freq.dat'
+    file_wave_time = Path(__file__).parent / 'data' / 'rand_wavelet_time.dat'
 
     dt = 30.
 

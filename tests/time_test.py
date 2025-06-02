@@ -19,7 +19,7 @@ if __name__=='__main__':
     #time and frequency grids
     ts = np.arange(0,ND)*dt
     fs = np.arange(0,ND//2+1)*1/(Tobs)
-    print("dt =",dt,"Nt =",Nt,"Nf =",Nf,"mult =",mult)
+    print('dt =',dt,'Nt =',Nt,'Nf =',Nf,'mult =',mult)
 
     #get a wavelet representation of a signal
     print('begin loading data files')

@@ -16,9 +16,9 @@ def test_inverse_wavelets():
     for random input data
     """
     #transform parameters
-    file_wave = Path(__file__).parent / "data" / "rand_wavelet.dat"
-    file_freq = Path(__file__).parent / "data" / "rand_wave_freq.dat"
-    file_time = Path(__file__).parent / "data" / "rand_wave_time.dat"
+    file_wave = Path(__file__).parent / 'data' / 'rand_wavelet.dat'
+    file_freq = Path(__file__).parent / 'data' / 'rand_wave_freq.dat'
+    file_time = Path(__file__).parent / 'data' / 'rand_wave_time.dat'
 
     dt = 30.
 

@@ -75,9 +75,7 @@ def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], da
     for jj in range(jj_base+1-Nt//2, jj_base+Nt//2):
         j = np.abs(jj-jj_base)
         i = i_base-jj_base+jj
-        if m == Nf and jj > jj_base:
-            DX[i] = 0.
-        elif m == 0 and jj < jj_base:
+        if (m == Nf and jj > jj_base) or (m == 0 and jj < jj_base):
             DX[i] = 0.
         elif j == 0:
             continue
@@ -110,7 +108,7 @@ def DX_unpack_loop(m: int, Nt: int, Nf: int, DX_trans: NDArray[np.complexfloatin
                     wave[n, m] = np.real(DX_trans[n])
 
 
-def transform_wavelet_freq_helper(data: NDArray[np.floating], Nf: int, Nt: int, phif: NDArray[np.floating]) -> NDArray[np.floating]:
+def transform_wavelet_freq_helper(data: NDArray[np.complexfloating], Nf: int, Nt: int, phif: NDArray[np.floating]) -> NDArray[np.floating]:
     """Helper to do the wavelet transform using the fast wavelet domain transform"""
     wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
 

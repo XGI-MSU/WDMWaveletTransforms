@@ -12,7 +12,7 @@ from WDMWaveletTransforms.wavelet_transforms import inverse_wavelet_freq_time
 def main():
     #assume input .dat file is Nt rows by Nf columns
     if len(sys.argv)!=4:
-        print("inverse_wavelet_freq_time_harness.py filename_wavelet_in filename_time_out dt")
+        print('inverse_wavelet_freq_time_harness.py filename_wavelet_in filename_time_out dt')
         sys.exit(1)
 
     file_in = sys.argv[1]
