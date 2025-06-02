@@ -1,12 +1,13 @@
 """functions for computing the inverse wavelet transforms"""
 import numpy as np
 from numba import njit
+from numpy.typing import NDArray
 
 import WDMWaveletTransforms.fft_funcs as fft
 
 
 @njit()
-def unpack_wave_inverse(m, Nt, Nf, phif, fft_prefactor2s, res):
+def unpack_wave_inverse(m: int, Nt: int, Nf: int, phif: NDArray[np.floating], fft_prefactor2s: NDArray[np.complexfloating], res: NDArray[np.complexfloating]) -> None:
     """Helper for unpacking results of frequency domain inverse transform"""
     if m == 0 or m == Nf:
         for i_ind in range(Nt//2):
@@ -56,7 +57,7 @@ def unpack_wave_inverse(m, Nt, Nf, phif, fft_prefactor2s, res):
 
 
 @njit()
-def pack_wave_inverse(m, Nt, Nf, prefactor2s, wave_in):
+def pack_wave_inverse(m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.floating], wave_in: NDArray[np.floating]) -> None:
     """Helper for fast frequency domain inverse transform to prepare for fourier transform"""
     if m == 0:
         for n in range(Nt):
@@ -76,7 +77,7 @@ def pack_wave_inverse(m, Nt, Nf, prefactor2s, wave_in):
 
 
 # @njit()
-def inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt):
+def inverse_wavelet_freq_helper_fast(wave_in: NDArray[np.floating], phif: NDArray[np.floating], Nf: int, Nt: int) -> NDArray[np.complexfloating]:
     """Jit compatible loop for inverse_wavelet_freq"""
     ND = Nf*Nt
 

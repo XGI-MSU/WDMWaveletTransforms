@@ -1,12 +1,19 @@
 """helper functions for transform_freq"""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import scipy.special
 from numba import njit
 
 import WDMWaveletTransforms.fft_funcs as fft
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
-def phitilde_vec(om, Nf, nx=4.):
+
+def phitilde_vec(om: NDArray[np.floating], Nf: int, nx: float=4.) -> NDArray[np.floating]:
     """Compute phitilde, om i array, nx is filter steepness, defaults to 4."""
     OM = np.pi   # Nyquist angular frequency
     DOM = OM/Nf  # 2 pi times DF
@@ -25,7 +32,7 @@ def phitilde_vec(om, Nf, nx=4.):
     return z
 
 
-def phitilde_vec_norm(Nf, Nt, nx):
+def phitilde_vec_norm(Nf: int, Nt: int, nx: float) -> NDArray[np.floating]:
     """Normalize phitilde as needed for inverse frequency domain transform"""
     ND = Nf*Nt
     oms = 2*np.pi/ND*np.arange(0, Nt//2+1)
@@ -38,7 +45,7 @@ def phitilde_vec_norm(Nf, Nt, nx):
 
 
 @njit()
-def tukey(data, alpha, N):
+def tukey(data: NDArray[np.floating | np.complexfloating], alpha: float, N: int) -> None:
     """Apply tukey window function to data"""
     imin = np.int64(alpha*(N-1)/2)
     imax = np.int64((N-1)*(1-alpha/2))
@@ -54,7 +61,7 @@ def tukey(data, alpha, N):
 
 
 @njit()
-def DX_assign_loop(m, Nt, Nf, DX, data, phif):
+def DX_assign_loop(m: int, Nt: int, Nf: int, DX: NDArray[np.complexfloating], data: NDArray[np.floating], phif: NDArray[np.floating]) -> None:
     """Helper for assigning DX in the main loop"""
     i_base = Nt//2
     jj_base = m*Nt//2
@@ -62,9 +69,7 @@ def DX_assign_loop(m, Nt, Nf, DX, data, phif):
     if m == 0 or m == Nf:
         # NOTE this term appears to be needed to recover correct constant (at least for m=0) but was previously missing
         DX[Nt//2] = phif[0]*data[m*Nt//2]/2.
-        DX[Nt//2] = phif[0]*data[m*Nt//2]/2.
     else:
-        DX[Nt//2] = phif[0]*data[m*Nt//2]
         DX[Nt//2] = phif[0]*data[m*Nt//2]
 
     for jj in range(jj_base+1-Nt//2, jj_base+Nt//2):
@@ -81,7 +86,7 @@ def DX_assign_loop(m, Nt, Nf, DX, data, phif):
 
 
 @njit()
-def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
+def DX_unpack_loop(m: int, Nt: int, Nf: int, DX_trans: NDArray[np.complexfloating], wave: NDArray[np.floating]) -> None:
     """Helper for unpacking fftd DX in main loop"""
     if m == 0:
         # half of lowest and highest frequency bin pixels are redundant
@@ -105,7 +110,7 @@ def DX_unpack_loop(m, Nt, Nf, DX_trans, wave):
                     wave[n, m] = np.real(DX_trans[n])
 
 
-def transform_wavelet_freq_helper(data, Nf, Nt, phif):
+def transform_wavelet_freq_helper(data: NDArray[np.floating], Nf: int, Nt: int, phif: NDArray[np.floating]) -> NDArray[np.floating]:
     """Helper to do the wavelet transform using the fast wavelet domain transform"""
     wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
 

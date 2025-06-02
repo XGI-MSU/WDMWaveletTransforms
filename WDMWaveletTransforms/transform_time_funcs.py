@@ -1,13 +1,14 @@
 """helper functions for transform_time.py"""
 import numpy as np
 from numba import njit
+from numpy.typing import NDArray
 
 import WDMWaveletTransforms.fft_funcs as fft
 from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec
 
 
 @njit()
-def assign_wdata(i, K, ND, Nf, wdata, data_pad, phi):
+def assign_wdata(i: int, K: int, ND: int, Nf: int, wdata: NDArray[np.floating], data_pad: NDArray[np.floating], phi: NDArray[np.floating]) -> None:
     """Assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
     # half_K = np.int64(K/2)
     jj = i*Nf-K//2
@@ -24,7 +25,7 @@ def assign_wdata(i, K, ND, Nf, wdata, data_pad, phi):
 
 
 @njit()
-def pack_wave(i, mult, Nf, wdata_trans, wave):
+def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complexfloating], wave: NDArray[np.floating]) -> None:
     """Pack fftd wdata into wave array"""
     if i % 2 == 0 and i < wave.shape[0]-1:
         # m=0 value at even Nt and
@@ -38,7 +39,7 @@ def pack_wave(i, mult, Nf, wdata_trans, wave):
             wave[i, j] = np.real(wdata_trans[j*mult])
 
 
-def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
+def transform_wavelet_time_helper(data: NDArray[np.floating], Nf: int, Nt: int, phi: NDArray[np.floating], mult: int) -> NDArray[np.floating]:
     """Helper function do do the wavelet transform in the time domain"""
     # the time domain data stream
     ND = Nf*Nt
@@ -64,7 +65,7 @@ def transform_wavelet_time_helper(data, Nf, Nt, phi, mult):
     return wave
 
 
-def phi_vec(Nf, nx=4., mult=16):
+def phi_vec(Nf: int, nx: float=4., mult: int=16) -> NDArray[np.floating]:
     """Get time domain phi as fourier transform of phitilde_vec"""
     # TODO fix mult
 

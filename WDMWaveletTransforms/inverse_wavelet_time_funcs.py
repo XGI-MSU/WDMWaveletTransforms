@@ -1,12 +1,13 @@
 """functions for computing the inverse wavelet transforms"""
 import numpy as np
 from numba import njit
+from numpy.typing import NDArray
 
 import WDMWaveletTransforms.fft_funcs as fft
 
 
 @njit()
-def unpack_time_wave_helper_compact(n, Nf, Nt, K, phis, fft_fin, res):
+def unpack_time_wave_helper_compact(n: int, Nf: int, Nt: int, K: int, phis: NDArray[np.floating], fft_fin: NDArray[np.complexfloating], res: NDArray[np.floating]) -> None:
     """Helper for time domain wavelet transform to unpack wavelet domain coefficients
     in compact representation where cosine and sine parts are real and imaginary parts
     """
@@ -32,7 +33,7 @@ def unpack_time_wave_helper_compact(n, Nf, Nt, K, phis, fft_fin, res):
 
 
 @njit()
-def pack_wave_time_helper_compact(n, Nf, Nt, wave_in, afins):
+def pack_wave_time_helper_compact(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.floating]) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients
     in packed representation with odd and even coefficients in real and imaginary pars
     """
@@ -51,7 +52,7 @@ def pack_wave_time_helper_compact(n, Nf, Nt, wave_in, afins):
     afins[Nf+1] = -1j*(wave_in[n, Nf-1]+wave_in[n+1, Nf-1])
 
 
-def inverse_wavelet_time_helper_fast(wave_in, phi, Nf, Nt, mult):
+def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray[np.floating], Nf: int, Nt: int, mult: int) -> NDArray[np.floating]:
     """Helper loop for fast inverse wavelet transform"""
     ND = Nf*Nt
     K = mult*2*Nf
@@ -88,7 +89,7 @@ def inverse_wavelet_time_helper_fast(wave_in, phi, Nf, Nt, mult):
 
 
 @njit()
-def unpack_time_wave_helper(n, Nf, Nt, K, phis, fft_fin_real, res):
+def unpack_time_wave_helper(n: int, Nf: int, Nt: int, K: int, phis: NDArray[np.floating], fft_fin_real: NDArray[np.floating], res: NDArray[np.floating]) -> None:
     """Helper for time domain wavelet transform to unpack wavelet domain coefficients"""
     ND = Nf*Nt
 
@@ -132,7 +133,7 @@ def unpack_time_wave_helper(n, Nf, Nt, K, phis, fft_fin_real, res):
 
 
 @njit()
-def pack_wave_time_helper(n, Nf, Nt, wave_in, afins):
+def pack_wave_time_helper(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.floating]) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients"""
     if n % 2 == 0:
         # assign highest and lowest bin correctly
