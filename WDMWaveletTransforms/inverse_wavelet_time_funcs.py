@@ -64,12 +64,6 @@ def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray
     afins = np.zeros(2*Nf, dtype=np.complex128)
 
     for n in range(Nt):
-        # old unpacked way, should still work but is necessarily slower,
-        # might be more comparable if it could be written as an irfft instead
-        # pack_wave_time_helper(n, Nf, Nt, wave_in, afins)
-        # ffts_fin_real = np.real(fft.fft(afins))
-        # unpack_time_wave_helper(n, Nf, Nt, K, phi, ffts_fin_real, res)
-
         # we can pack both the sin and cos parts into the real and imaginary parts
         # of the same transform so we only need to do every other one
         # this currently assumes Nt is even
@@ -86,76 +80,3 @@ def inverse_wavelet_time_helper_fast(wave_in: NDArray[np.floating], phi: NDArray
     res = res[:ND]
 
     return res
-
-
-@njit()
-def unpack_time_wave_helper(n: int, Nf: int, Nt: int, K: int, phis: NDArray[np.floating], fft_fin_real: NDArray[np.floating], res: NDArray[np.floating]) -> None:
-    """Helper for time domain wavelet transform to unpack wavelet domain coefficients"""
-    ND = Nf*Nt
-
-    idxf = (-K//2+n*Nf+ND) % (2*Nf)
-    k = (-K//2+n*Nf) % ND
-
-    for k_ind in range(K):
-        res_loc = fft_fin_real[idxf]
-        res[k] += phis[k_ind]*res_loc
-        idxf += 1
-        k += 1
-
-        if idxf == 2*Nf:
-            idxf = 0
-        if k == ND:
-            k = 0
-
-# @njit()
-# def pack_wave_time_helper(n, Nf, Nt, wave_in, afins):
-#    """helper for time domain transform to pack wavelet domain coefficients"""
-#    if n % 2 == 0:
-#        # assign highest and lowest bin correctly
-#        afins[0] = 1/np.sqrt(2)*wave_in[n, 0]
-#        if n+1 < Nt:
-#            afins[Nf] = 1/np.sqrt(2)*wave_in[n+1, 0]
-#    else:
-#        afins[0] = 0.
-#        afins[Nf] = 0.
-#
-#    for idxm in range(0, Nf//2-1):
-#        if n % 2:
-#            afins[2*idxm+2] = 1j*wave_in[n, 2*idxm+2]
-#        else:
-#            afins[2*idxm+2] = wave_in[n, 2*idxm+2]
-#
-#    for idxm in range(0, Nf//2):
-#        if n % 2:
-#            afins[2*idxm+1] = -wave_in[n, 2*idxm+1]
-#        else:
-#            afins[2*idxm+1] = 1j*wave_in[n, 2*idxm+1]
-
-
-@njit()
-def pack_wave_time_helper(n: int, Nf: int, Nt: int, wave_in: NDArray[np.floating], afins: NDArray[np.floating]) -> None:
-    """Helper for time domain transform to pack wavelet domain coefficients"""
-    if n % 2 == 0:
-        # assign highest and lowest bin correctly
-        afins[0] = np.sqrt(2)*wave_in[n, 0]
-        if n+1 < Nt:
-            afins[Nf] = np.sqrt(2)*wave_in[n+1, 0]
-    else:
-        afins[0] = 0.
-        afins[Nf] = 0.
-
-    for idxm in range(Nf//2-1):
-        if n % 2:
-            afins[2*idxm+2] = 1j*wave_in[n, 2*idxm+2]
-            afins[2*Nf-2*idxm-2] = -1j*wave_in[n, 2*idxm+2]
-        else:
-            afins[2*idxm+2] = 1*wave_in[n, 2*idxm+2]
-            afins[2*Nf-2*idxm-2] = 1*wave_in[n, 2*idxm+2]
-
-    for idxm in range(Nf//2):
-        if n % 2:
-            afins[2*idxm+1] = -1*wave_in[n, 2*idxm+1]
-            afins[2*Nf-2*idxm-1] = -1*wave_in[n, 2*idxm+1]
-        else:
-            afins[2*idxm+1] = 1j*wave_in[n, 2*idxm+1]
-            afins[2*Nf-2*idxm-1] = -1j*wave_in[n, 2*idxm+1]
