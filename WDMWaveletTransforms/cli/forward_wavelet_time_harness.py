@@ -1,5 +1,6 @@
-""""harness for computing forward frequency domain wavelet transform, take input .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"
-write to .dat file in wavelet domain (Nt rows by Nf columns)
+"""Harness for computing forward frequency domain wavelet transform.
+Take input .dat file in frequency domain (columns frequency, real part(h(f)), imag part(h(f))"
+write to .dat file in wavelet domain (Nt rows by Nf columns).
 """
 
 import sys
@@ -11,11 +12,11 @@ from WDMWaveletTransforms.wavelet_transforms import transform_wavelet_time
 
 
 def main() -> None:
-    if len(sys.argv)!=7:
+    if len(sys.argv) != 7:
         print('forward_wavelet_time_harness.py filename_time_in filename_wavelet_out dt Nt Nf mult')
         sys.exit(1)
 
-    #transform parameters
+    # transform parameters
     file_in = sys.argv[1]
     file_out = sys.argv[2]
 
@@ -26,28 +27,28 @@ def main() -> None:
 
     print('begin loading data file')
     t0 = perf_counter()
-    #the frequency domain representation
-    ts_in,signal_time = np.loadtxt(file_in).T
+    # the frequency domain representation
+    ts_in, signal_time = np.loadtxt(file_in).T
     t1 = perf_counter()
-    print('loaded input file in %5.3fs'%(t1-t0))
+    print('loaded input file in %5.3fs' % (t1 - t0))
 
-    ND = Nt*Nf
+    ND = Nt * Nf
 
-    #time and frequency grids
-    ts = dt*np.arange(0,ND)
-    assert np.all(ts==ts_in)
+    # time and frequency grids
+    ts = dt * np.arange(0, ND)
+    assert np.all(ts == ts_in)
 
     t0 = perf_counter()
-    wave_freq = transform_wavelet_time(signal_time,Nf,Nt)
+    wave_freq = transform_wavelet_time(signal_time, Nf, Nt)
     t1 = perf_counter()
 
-    print('got time domain transform in %5.3fs'%(t1-t0))
+    print('got time domain transform in %5.3fs' % (t1 - t0))
 
     t4 = perf_counter()
-    np.savetxt(file_out,wave_freq)
+    np.savetxt(file_out, wave_freq)
     t5 = perf_counter()
-    print('saved file in %5.3fs'%(t5-t4))
+    print('saved file in %5.3fs' % (t5 - t4))
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

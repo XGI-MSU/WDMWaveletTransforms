@@ -1,6 +1,7 @@
 """helper to make sure available fft functions are consistent across modules depending on install
 mkl-fft is faster so it is the default, but numpy fft is probably more commonly installed to it is the fallback
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -15,17 +16,24 @@ if TYPE_CHECKING:
 
 
 # ----- rfft -----
-def rfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
+def rfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]:  # type: ignore [empty-body]
     ...
+
+
 # ----- irfft -----
-def irfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.float64]: # type: ignore [empty-body]
+def irfft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.float64]:  # type: ignore [empty-body]
     ...
+
+
 # ----- fft -----
-def fft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
+def fft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]:  # type: ignore [empty-body]
     ...
+
+
 # ----- ifft -----
-def ifft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]: # type: ignore [empty-body]
+def ifft(a: ArrayLike, n: int | None = None, axis: int = -1, norm: str | None = None) -> NDArray[np.complex128]:  # type: ignore [empty-body]
     ...
+
 
 try:
     import mkl_fft  # type: ignore[import]
