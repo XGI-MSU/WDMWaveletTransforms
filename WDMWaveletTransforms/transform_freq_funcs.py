@@ -63,7 +63,12 @@ def tukey(data: NDArray[np.float64 | np.complex128], alpha: float, N: int) -> No
 
 @njit()
 def DX_assign_loop(
-    m: int, Nt: int, Nf: int, DX: NDArray[np.complex128], data: NDArray[np.complex128], phif: NDArray[np.float64],
+    m: int,
+    Nt: int,
+    Nf: int,
+    DX: NDArray[np.complex128],
+    data: NDArray[np.complex128],
+    phif: NDArray[np.float64],
 ) -> None:
     """Helper for assigning DX in the main loop"""
     assert len(DX.shape) == 1, 'Storage array must be 1D'
@@ -117,7 +122,10 @@ def DX_unpack_loop(m: int, Nt: int, Nf: int, DX_trans: NDArray[np.complex128], w
 
 
 def transform_wavelet_freq_helper(
-    data: NDArray[np.complex128], Nf: int, Nt: int, phif: NDArray[np.float64],
+    data: NDArray[np.complex128],
+    Nf: int,
+    Nt: int,
+    phif: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Helper to do the wavelet transform using the fast wavelet domain transform"""
     assert len(data.shape) == 1, 'Only support 1D Arrays currently'

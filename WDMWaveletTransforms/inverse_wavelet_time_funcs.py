@@ -43,7 +43,11 @@ def unpack_time_wave_helper_compact(
 
 @njit()
 def pack_wave_time_helper_compact(
-    n: int, Nf: int, Nt: int, wave_in: NDArray[np.float64], afins: NDArray[np.complex128],
+    n: int,
+    Nf: int,
+    Nt: int,
+    wave_in: NDArray[np.float64],
+    afins: NDArray[np.complex128],
 ) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients
     in packed representation with odd and even coefficients in real and imaginary pars
@@ -64,7 +68,11 @@ def pack_wave_time_helper_compact(
 
 
 def inverse_wavelet_time_helper_fast(
-    wave_in: NDArray[np.float64], phi: NDArray[np.float64], Nf: int, Nt: int, mult: int,
+    wave_in: NDArray[np.float64],
+    phi: NDArray[np.float64],
+    Nf: int,
+    Nt: int,
+    mult: int,
 ) -> NDArray[np.float64]:
     """Helper loop for fast inverse wavelet transform"""
     ND = Nf * Nt

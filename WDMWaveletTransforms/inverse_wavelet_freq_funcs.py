@@ -67,7 +67,11 @@ def unpack_wave_inverse(
 
 @njit()
 def pack_wave_inverse(
-    m: int, Nt: int, Nf: int, prefactor2s: NDArray[np.complex128], wave_in: NDArray[np.float64],
+    m: int,
+    Nt: int,
+    Nf: int,
+    prefactor2s: NDArray[np.complex128],
+    wave_in: NDArray[np.float64],
 ) -> None:
     """Helper for fast frequency domain inverse transform to prepare for fourier transform"""
     if m == 0:
@@ -89,7 +93,10 @@ def pack_wave_inverse(
 
 # @njit()
 def inverse_wavelet_freq_helper_fast(
-    wave_in: NDArray[np.float64], phif: NDArray[np.float64], Nf: int, Nt: int,
+    wave_in: NDArray[np.float64],
+    phif: NDArray[np.float64],
+    Nf: int,
+    Nt: int,
 ) -> NDArray[np.complex128]:
     """Jit compatible loop for inverse_wavelet_freq"""
     ND = Nf * Nt

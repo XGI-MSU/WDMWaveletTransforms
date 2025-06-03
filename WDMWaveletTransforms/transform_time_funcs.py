@@ -57,7 +57,11 @@ def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complex128], w
 
 
 def transform_wavelet_time_helper(
-    data: NDArray[np.float64], Nf: int, Nt: int, phi: NDArray[np.float64], mult: int,
+    data: NDArray[np.float64],
+    Nf: int,
+    Nt: int,
+    phi: NDArray[np.float64],
+    mult: int,
 ) -> NDArray[np.float64]:
     """Helper function do do the wavelet transform in the time domain"""
     # the time domain data stream
