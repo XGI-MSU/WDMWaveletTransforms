@@ -16,20 +16,22 @@ if __name__ == '__main__':
     Nf = 1024
     Nt = 2048
     mult = 64
+    mult_f = 4
     gen = np.random.default_rng(314159)
 
     data_time = gen.normal(0.0, 1.0, Nf * Nt)
 
     data_wavelet1 = transform_wavelet_time(data_time, Nf, Nt, mult=mult)
-    data_wavelet2 = transform_wavelet_freq_time(data_time, Nf, Nt)
+    data_wavelet2 = transform_wavelet_freq_time(data_time, Nf, Nt, mult_f=mult_f)
 
     assert_allclose(np.var(data_wavelet1), np.var(data_wavelet2), atol=1.0e-10, rtol=1.0e-3)
     # assert_allclose(np.mean(data_wavelet1), np.mean(data_wavelet2), atol=1.e-10, rtol=1.e-4)
 
     data_time_rec1 = inverse_wavelet_time(data_wavelet1, Nf, Nt, mult=mult)
-    data_time_rec1_2 = inverse_wavelet_freq_time(data_wavelet1, Nf, Nt)
+    data_time_rec1_2 = inverse_wavelet_freq_time(data_wavelet1, Nf, Nt, mult_f=mult_f)
     data_time_rec2 = inverse_wavelet_time(data_wavelet2, Nf, Nt, mult=mult)
-    data_time_rec2_2 = inverse_wavelet_freq_time(data_wavelet2, Nf, Nt)
+    data_time_rec2_2 = inverse_wavelet_freq_time(data_wavelet2, Nf, Nt, mult_f=mult_f)
+    data_wavelet3 = transform_wavelet_time(data_time_rec1_2, Nf, Nt, mult=mult)
 
     # check correlation of streams
     assert_allclose(1.0 - np.corrcoef(data_time, data_time_rec1)[0, 1], 0.0, atol=1.0e-14)

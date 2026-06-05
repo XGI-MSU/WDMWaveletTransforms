@@ -4,10 +4,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 import WDMWaveletTransforms.fft_funcs as fft
+import WDMWaveletTransforms.modified_gaussian as mg
 from WDMWaveletTransforms.inverse_wavelet_freq_funcs import inverse_wavelet_freq_helper_fast
 from WDMWaveletTransforms.inverse_wavelet_time_funcs import inverse_wavelet_time_helper_fast
-from WDMWaveletTransforms.transform_freq_funcs import phitilde_vec_norm, transform_wavelet_freq_helper
-from WDMWaveletTransforms.transform_time_funcs import phi_vec, transform_wavelet_time_helper
+from WDMWaveletTransforms.transform_freq_funcs import transform_wavelet_freq_helper
+from WDMWaveletTransforms.transform_time_funcs import transform_wavelet_time_helper
 
 __all__ = [
     'inverse_wavelet_freq',
@@ -29,22 +30,28 @@ def inverse_wavelet_time(
     """Fast inverse wavelet transform to time domain"""
     assert len(wave_in.shape) == 2, 'Only 2D Arrays supported currently'
     mult = int(min(mult, int(Nt // 2)))  # make sure K isn't bigger than ND
-    phi: NDArray[np.float64] = phi_vec(Nf, nx=nx, mult=mult) / 2
+    # phi: NDArray[np.float64] = phi_vec(Nf, nx=nx, mult=mult) / 2
+    phi: NDArray[np.float64] = mg.phi_vec(Nf=Nf, mult=mult) / 2
 
     return inverse_wavelet_time_helper_fast(wave_in, phi, Nf, Nt, mult)
 
 
-def inverse_wavelet_freq(wave_in: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0) -> NDArray[np.complex128]:
+def inverse_wavelet_freq(
+    wave_in: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0, mult_f: int = 1
+) -> NDArray[np.complex128]:
     """Inverse wavelet transform to freq domain signal"""
     assert len(wave_in.shape) == 2, 'Only 2D Arrays supported currently'
-    phif: NDArray[np.float64] = phitilde_vec_norm(Nf, Nt, nx)
-    return inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt)
+    # phif: NDArray[np.float64] = phitilde_vec_norm(Nf, Nt, nx, mult_f)
+    phif: NDArray[np.float64] = mg.phitilde_vec_norm(Nf, Nt, mult_f)
+    return inverse_wavelet_freq_helper_fast(wave_in, phif, Nf, Nt, mult_f)
 
 
-def inverse_wavelet_freq_time(wave_in: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0) -> NDArray[np.float64]:
+def inverse_wavelet_freq_time(
+    wave_in: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0, mult_f: int = 1
+) -> NDArray[np.float64]:
     """Inverse wavlet transform to time domain via fourier transform of frequency domain"""
     assert len(wave_in.shape) == 2, 'Only 2D Arrays supported currently'
-    res_f: NDArray[np.complex128] = inverse_wavelet_freq(wave_in, Nf, Nt, nx)
+    res_f: NDArray[np.complex128] = inverse_wavelet_freq(wave_in, Nf, Nt, nx, mult_f)
     return fft.irfft(res_f)
 
 
@@ -61,20 +68,26 @@ def transform_wavelet_time(
     """
     assert len(data.shape) == 1, 'Only 1D Arrays supported currently'
     mult = int(min(mult, int(Nt // 2)))  # make sure K isn't bigger than ND
-    phi: NDArray[np.float64] = phi_vec(Nf, nx, mult)
+    # phi: NDArray[np.float64] = phi_vec(Nf, nx, mult)
+    phi: NDArray[np.float64] = mg.phi_vec(Nf=Nf, mult=mult)
     return transform_wavelet_time_helper(data, Nf, Nt, phi, mult)
 
 
-def transform_wavelet_freq(data: NDArray[np.complex128], Nf: int, Nt: int, nx: float = 4.0) -> NDArray[np.float64]:
+def transform_wavelet_freq(
+    data: NDArray[np.complex128], Nf: int, Nt: int, nx: float = 4.0, mult_f: int = 1
+) -> NDArray[np.float64]:
     """Do the wavelet transform using the fast wavelet domain transform"""
     assert len(data.shape) == 1, 'Only 1D Arrays supported currently'
-    phif: NDArray[np.float64] = 2 / Nf * phitilde_vec_norm(Nf, Nt, nx)
-    return transform_wavelet_freq_helper(data, Nf, Nt, phif)
+    # phif: NDArray[np.float64] = 2 / Nf * phitilde_vec_norm(Nf, Nt, nx, mult_f)
+    phif: NDArray[np.float64] = 2 / Nf * mg.phitilde_vec_norm(Nf, Nt, mult_f)
+    return transform_wavelet_freq_helper(data, Nf, Nt, mult_f, phif)
 
 
-def transform_wavelet_freq_time(data: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0) -> NDArray[np.float64]:
+def transform_wavelet_freq_time(
+    data: NDArray[np.float64], Nf: int, Nt: int, nx: float = 4.0, mult_f: int = 1
+) -> NDArray[np.float64]:
     """Transform time domain data into wavelet domain via fft and then frequency transform"""
     assert len(data.shape) == 1, 'Only 1D Arrays supported currently'
     data_fft: NDArray[np.complex128] = fft.rfft(data)
 
-    return transform_wavelet_freq(data_fft, Nf, Nt, nx)
+    return transform_wavelet_freq(data_fft, Nf, Nt, nx=nx, mult_f=mult_f)

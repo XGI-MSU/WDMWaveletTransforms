@@ -13,9 +13,9 @@ def unpack_time_wave_helper_compact(
     Nf: int,
     Nt: int,
     K: int,
-    phis: NDArray[np.float64],
-    fft_fin: NDArray[np.complex128],
-    res: NDArray[np.float64],
+    phis: NDArray[np.floating],
+    fft_fin: NDArray[np.complexfloating],
+    res: NDArray[np.floating],
 ) -> None:
     """Helper for time domain wavelet transform to unpack wavelet domain coefficients
     in compact representation where cosine and sine parts are real and imaginary parts
@@ -46,8 +46,8 @@ def pack_wave_time_helper_compact(
     n: int,
     Nf: int,
     Nt: int,
-    wave_in: NDArray[np.float64],
-    afins: NDArray[np.complex128],
+    wave_in: NDArray[np.floating],
+    afins: NDArray[np.complexfloating],
 ) -> None:
     """Helper for time domain transform to pack wavelet domain coefficients
     in packed representation with odd and even coefficients in real and imaginary pars
@@ -68,21 +68,21 @@ def pack_wave_time_helper_compact(
 
 
 def inverse_wavelet_time_helper_fast(
-    wave_in: NDArray[np.float64],
-    phi: NDArray[np.float64],
+    wave_in: NDArray[np.floating],
+    phi: NDArray[np.floating],
     Nf: int,
     Nt: int,
     mult: int,
-) -> NDArray[np.float64]:
+) -> NDArray[np.floating]:
     """Helper loop for fast inverse wavelet transform"""
     ND = Nf * Nt
     K = mult * 2 * Nf
     # res = np.zeros(ND)
 
     # extend this array, we can use wrapping boundary conditions at end
-    res: NDArray[np.float64] = np.zeros(ND + K + Nf, dtype=np.float64)
+    res: NDArray[np.floating] = np.zeros(ND + K + Nf, dtype=float)
 
-    afins = np.zeros(2 * Nf, dtype=np.complex128)
+    afins = np.zeros(2 * Nf, dtype=complex)
 
     for n in range(Nt):
         # we can pack both the sin and cos parts into the real and imaginary parts
@@ -98,4 +98,4 @@ def inverse_wavelet_time_helper_fast(
     if K + Nf > ND:
         res[: K + Nf - ND] += res[2 * ND : ND + K * Nf]
 
-    return np.asarray(res[:ND], dtype=np.float64)
+    return np.asarray(res[:ND], dtype=float)

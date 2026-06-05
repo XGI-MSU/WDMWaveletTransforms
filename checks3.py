@@ -17,30 +17,6 @@ if __name__ == '__main__':
     print('max |Im phihat| =', np.max(np.abs(np.imag(phihat))))
 
     # ============================================================
-    # Plot phi and phihat
-    # ============================================================
-
-    plt.figure(figsize=(8, 4))
-    plt.plot(x_plot, np.real(phi))
-    plt.axhline(0, linewidth=0.5)
-    plt.xlim(-5, 5)
-    plt.xlabel(r'$x$')
-    plt.ylabel(r'$\phi(x)$')
-    plt.title(r'$\phi(x)$')
-    plt.grid(True)
-    plt.tight_layout()
-
-    plt.figure(figsize=(8, 4))
-    plt.plot(y_plot, np.real(phihat))
-    plt.axhline(0, linewidth=0.5)
-    plt.xlim(-5, 5)
-    plt.xlabel(r'$y$')
-    plt.ylabel(r'$\widehat{\phi}(y)$')
-    plt.title(r'$\widehat{\phi}(y)$')
-    plt.grid(True)
-    plt.tight_layout()
-
-    # ============================================================
     # Partition of unity check using phi
     #
     # Check:
@@ -60,18 +36,6 @@ if __name__ == '__main__':
     print('  max =', partition_phi.max())
     print('  max error =', np.max(np.abs(partition_phi - 1.0)))
 
-    plt.figure(figsize=(8, 4))
-    plt.plot(x0, partition_phi)
-    plt.axhline(1.0, linestyle='--', linewidth=1)
-    plt.xlabel(r'$x$')
-    plt.ylabel(r'$\sum_k |\phi(x+k)|^2$')
-    plt.title(r'Partition of unity check using $\phi(x)$')
-    plt.grid(True)
-    plt.tight_layout()
-    ep = 1e-9
-    plt.ylim([1 - ep, 1 + ep])
-    plt.show()
-
     # ============================================================
     # Equation 2.3-style orthogonality diagnostics using phi
     #
@@ -88,7 +52,7 @@ if __name__ == '__main__':
     #   D_j(theta) = 0
     # ============================================================
 
-    theta = np.linspace(0, 1, 1000, endpoint=False)
+    theta = np.linspace(0, 2, 1000, endpoint=False)
     L_orth = 40
     j_values = range(-4, 5)
 
@@ -113,6 +77,42 @@ if __name__ == '__main__':
         D_err = np.max(np.abs(Dj))
 
         print(f'{j:+d}    {C_err:14.6e}    {D_err:14.6e}')
+
+    # ============================================================
+    # Plot phi and phihat
+    # ============================================================
+
+    plt.figure(figsize=(8, 4))
+    plt.plot(x_plot, np.real(phi))
+    plt.axhline(0, linewidth=0.5)
+    plt.xlim(-5, 5)
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$\phi(x)$')
+    plt.title(r'$\phi(x)$')
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.figure(figsize=(8, 4))
+    plt.plot(y_plot, np.real(phihat))
+    plt.axhline(0, linewidth=0.5)
+    plt.xlim(-5, 5)
+    plt.xlabel(r'$y$')
+    plt.ylabel(r'$\widehat{\phi}(y)$')
+    plt.title(r'$\widehat{\phi}(y)$')
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.figure(figsize=(8, 4))
+    plt.plot(x0, partition_phi)
+    plt.axhline(1.0, linestyle='--', linewidth=1)
+    plt.xlabel(r'$x$')
+    plt.ylabel(r'$\sum_k |\phi(x+k)|^2$')
+    plt.title(r'Partition of unity check using $\phi(x)$')
+    plt.grid(True)
+    plt.tight_layout()
+    ep = 1e-9
+    plt.ylim([1 - ep, 1 + ep])
+    plt.show()
 
     # ============================================================
     # Plot selected C_j curves

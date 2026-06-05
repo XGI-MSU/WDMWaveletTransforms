@@ -31,19 +31,37 @@ if __name__ == '__main__':
     Nt = 1024
     gen = np.random.default_rng(314159)
 
+    mult_f = 7
+
     scale = np.sqrt((Nf * Nt) // 2)
     data_freq = scale * (gen.normal(0.0, 1.0, (Nf * Nt) // 2 + 1) + 1j * gen.normal(0.0, 1.0, (Nf * Nt) // 2 + 1))
     # highest and lowest frequency components are real
     data_freq[0] = np.real(data_freq[0])
     data_freq[-1] = np.real(data_freq[-1])
 
-    data_wavelet = transform_wavelet_freq(data_freq, Nf, Nt)
+    data_wavelet = transform_wavelet_freq(data_freq, Nf, Nt, mult_f=mult_f)
     # TODO temporary fudge until normalization issue handled
     # data_wavelet = data_wavelet / (np.std(data_wavelet))
-    data_freq_rec = inverse_wavelet_freq(data_wavelet, Nf, Nt)
+    data_freq_rec = inverse_wavelet_freq(data_wavelet, Nf, Nt, mult_f=mult_f)
 
     print(scale * np.var(data_wavelet) / np.var(data_freq))
     print(np.mean(data_freq_rec / data_freq), np.var(data_freq_rec) / np.var(data_freq))
+
+    import matplotlib.pyplot as plt
+
+    plt.plot(np.arange(0, Nf * Nt // 2 + 1) / (Nt // 2), np.abs(data_freq) - np.abs(data_freq_rec))
+    plt.show()
+
+    plt.plot(np.abs((data_freq - data_freq_rec)[:-1].reshape(Nf, Nt // 2)))
+    plt.show()
+    # plt.plot((np.abs(data_freq)-np.abs(data_freq_rec))[::Nt//2])
+    plt.plot((np.abs(data_freq - data_freq_rec))[: Nt // 2])
+    plt.plot((np.abs(data_freq) - np.abs(data_freq_rec))[: Nt // 2])
+    plt.show()
+
+    plt.plot((np.real(data_freq))[: Nt // 2])
+    plt.plot((np.real(data_freq_rec))[: Nt // 2])
+    plt.show()
 
     # check correlation of streams
     assert_allclose(1.0 - np.corrcoef(np.real(data_freq), np.real(data_freq_rec))[0, 1], 0.0, atol=1.0e-5)
@@ -94,7 +112,5 @@ if __name__ == '__main__':
     assert_allclose(np.mean(corr_wave, axis=0), 0.0, atol=1.0e-4)
     assert_allclose(np.mean(corr_wave, axis=1), 0.0, atol=1.0e-4)
 
-    # import matplotlib.pyplot as plt
-    # plt.plot(data_freq)
     # plt.plot(data_freq_rec)
     # plt.show()

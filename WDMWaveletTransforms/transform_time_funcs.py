@@ -14,9 +14,9 @@ def assign_wdata(
     K: int,
     ND: int,
     Nf: int,
-    wdata: NDArray[np.float64],
-    data_pad: NDArray[np.float64],
-    phi: NDArray[np.float64],
+    wdata: NDArray[np.floating],
+    data_pad: NDArray[np.floating],
+    phi: NDArray[np.floating],
 ) -> None:
     """Assign wdata to be fftd in loop, data_pad needs K extra values on the right to loop"""
     assert len(wdata.shape) == 1, 'Input data array must be 1D'
@@ -38,7 +38,7 @@ def assign_wdata(
 
 
 @njit()
-def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complex128], wave: NDArray[np.float64]) -> None:
+def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complexfloating], wave: NDArray[np.floating]) -> None:
     """Pack fftd wdata into wave array"""
     assert len(wdata_trans.shape) == 1, 'Input data array must be 1D'
     assert wdata_trans.size == Nf * mult + 1, 'Input array must have size Nf*mult+1'
@@ -57,12 +57,12 @@ def pack_wave(i: int, mult: int, Nf: int, wdata_trans: NDArray[np.complex128], w
 
 
 def transform_wavelet_time_helper(
-    data: NDArray[np.float64],
+    data: NDArray[np.floating],
     Nf: int,
     Nt: int,
-    phi: NDArray[np.float64],
+    phi: NDArray[np.floating],
     mult: int,
-) -> NDArray[np.float64]:
+) -> NDArray[np.floating]:
     """Helper function do do the wavelet transform in the time domain"""
     # the time domain data stream
     ND = Nf * Nt
@@ -88,7 +88,7 @@ def transform_wavelet_time_helper(
     return wave
 
 
-def phi_vec(Nf: int, nx: float = 4.0, mult: int = 16) -> NDArray[np.float64]:
+def phi_vec(Nf: int, nx: float = 4.0, mult: int = 16) -> NDArray[np.floating]:
     """Get time domain phi as fourier transform of phitilde_vec"""
     # TODO fix mult
 
@@ -98,9 +98,9 @@ def phi_vec(Nf: int, nx: float = 4.0, mult: int = 16) -> NDArray[np.float64]:
     K: int = int(mult * 2 * Nf)
     half_K: int = int(mult * Nf)  # np.int64(K/2)
 
-    dom: np.float64 = np.float64(2 * np.pi / K)  # max frequency is K/2*dom = pi/dt = OM
+    dom: float = 2 * np.pi / K  # max frequency is K/2*dom = pi/dt = OM
 
-    phitilde_loc = np.zeros(K, dtype=np.complex128)
+    phitilde_loc = np.zeros(K, dtype=complex)
 
     # zero frequency
     phitilde_loc[0] = insDOM
@@ -113,7 +113,7 @@ def phi_vec(Nf: int, nx: float = 4.0, mult: int = 16) -> NDArray[np.float64]:
 
     del phitilde_loc
 
-    phi = np.zeros(K, dtype=np.float64)
+    phi = np.zeros(K, dtype=float)
     phi[0:half_K] = np.real(phi_loc[half_K:K])
     phi[half_K:] = np.real(phi_loc[0:half_K])
 
