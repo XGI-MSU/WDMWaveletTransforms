@@ -65,64 +65,6 @@ def tukey(data: NDArray[np.floating | np.complexfloating], alpha: float, N: int)
 
 
 @njit()
-def DX_assign_loop_old(
-    m: int,
-    Nt: int,
-    Nf: int,
-    mult_f: int,
-    DX: NDArray[np.complexfloating],
-    data: NDArray[np.complexfloating],
-    phif: NDArray[np.floating],
-) -> None:
-    """Helper for assigning DX in the main loop"""
-    assert len(DX.shape) == 1, 'Storage array must be 1D'
-    assert len(data.shape) == 1, 'Data must be 1D'
-    assert len(phif.shape) == 1, 'Phi array must be 1D'
-
-    assert 0 <= m <= Nf
-    assert Nf % 2 == 0
-    assert Nt % 2 == 0
-    assert Nf > 0
-    assert Nt > 0
-    assert mult_f > 0
-
-    K = mult_f * Nt
-    half_K = int(K // 2)
-    half_Nt = int(Nt // 2)
-
-    ND = Nf * Nt
-    half_ND = int(ND // 2)
-
-    assert phif.shape == (half_K + 1,)
-    assert DX.shape == (K,)
-    assert data.shape == (half_ND + 1,)
-
-    DX[:] = 0.0
-
-    i_base: int = mult_f * half_Nt
-    jj_base: int = m * half_Nt
-    if m in (0, Nf):
-        # NOTE this term appears to be needed to recover correct constant (at least for m=0) but was previously missing
-        DX[half_K] = phif[0] * data[m * half_Nt] / 2.0
-    else:
-        DX[half_K] = phif[0] * data[m * half_Nt]
-
-    # should never be set anywhere, but explicitly ensure it is 0
-    DX[0] = 0.0
-
-    for jj in range(jj_base + 1 - half_K, jj_base + half_K, mult_f):
-        j: int = int(np.abs(jj - jj_base))
-        i: int = i_base - jj_base + jj
-        if jj < 0 or jj > half_ND or (m == Nf and jj > jj_base) or (m == 0 and jj < jj_base):
-            DX[i] = 0.0
-        elif j == 0:
-            # happens when i == half_K, handled as special case above
-            continue
-        else:
-            DX[i] = phif[j] * data[jj]
-
-
-@njit()
 def DX_assign_loop(
     m: int,
     Nt: int,
@@ -132,7 +74,23 @@ def DX_assign_loop(
     data: NDArray[np.complexfloating],
     phif: NDArray[np.floating],
 ) -> None:
-    """Helper for assigning DX in the main loop"""
+    """Helper for assigning DX in the main loop.
+
+    Tap delta = i - K/2 multiplies the spectrum at bin jj = m*Nt/2 + delta.  For
+    interior bands, bins outside the rfft range [0, ND/2] are read from the full
+    conjugate-symmetric spectrum of the real signal: X[-jj] = conj(X[jj]) and
+    X[ND - jj] = conj(X[jj]) ("conjugate fold-back"), which makes the pixel the
+    exact inner product with the real wavelet even when the window crosses the
+    frequency extremes.  The self-conjugate bands m = 0 and m = Nf instead keep
+    only their own half-plane with the center tap halved: the reflection maps
+    the window onto itself there, so Re[] of the half sum is already the exact
+    fold.
+
+    Taps are alias-folded onto one Nt-period (the transform only ever needs the
+    length-K ifft at stride mult_f, which equals the length-Nt ifft of the
+    aliased taps), so DX has length Nt.  The unpaired tap at delta = -K/2 is
+    excluded: effective support is the open range delta in (-K/2, K/2).
+    """
     assert len(DX.shape) == 1, 'Storage array must be 1D'
     assert len(data.shape) == 1, 'Data must be 1D'
     assert len(phif.shape) == 1, 'Phi array must be 1D'
@@ -142,7 +100,7 @@ def DX_assign_loop(
     assert Nt % 2 == 0
     assert Nf > 0
     assert Nt > 0
-    assert mult_f > 0
+    assert 0 < mult_f <= Nf
 
     K = mult_f * Nt
     half_K = int(K // 2)
@@ -152,34 +110,44 @@ def DX_assign_loop(
     half_ND = int(ND // 2)
 
     assert phif.shape == (half_K + 1,)
-    assert DX.shape == (K,)
+    assert DX.shape == (Nt,)
     assert data.shape == (half_ND + 1,)
 
     DX[:] = 0.0
 
-    i_base: int = mult_f * half_Nt
-    jj_base: int = m * half_Nt
-    for i in range(K):
+    for i in range(1, K):
         j = abs(i - half_K)
         jj = m * half_Nt + i - half_K
         if j == 0:
             if m in (0, Nf):
-                # NOTE this term appears to be needed to recover correct constant (at least for m=0) but was previously missing
-                DX[i] = phif[j] * data[jj] / 2.0
+                # halve the self-conjugate center tap
+                DX[i % Nt] += phif[j] * data[jj] / 2.0
             else:
-                DX[i] = phif[j] * data[jj]
+                DX[i % Nt] += phif[j] * data[jj]
         elif jj < 0 or jj > half_ND:
-            DX[i] = 0.0
+            if m in (0, Nf):
+                # self-conjugate bands keep only their own half-plane
+                pass
+            elif jj < 0:
+                DX[i % Nt] += phif[j] * np.conj(data[-jj])
+            else:
+                DX[i % Nt] += phif[j] * np.conj(data[ND - jj])
         else:
-            DX[i] = phif[j] * data[jj]
-    DX[0] = 0.0
+            DX[i % Nt] += phif[j] * data[jj]
 
 
 @njit()
 def DX_unpack_loop(
     m: int, Nt: int, Nf: int, mult_f: int, DX_trans: NDArray[np.complexfloating], wave: NDArray[np.floating]
 ) -> None:
-    """Helper for unpacking fftd DX in main loop"""
+    """Helper for unpacking fftd DX in main loop.
+
+    DX_trans is the length-Nt ifft of the alias-folded taps; the tap positions
+    carry an offset of mult_f*Nt/2, so relative to the (-1)^n convention of the
+    analytic coefficient an extra factor (-1)^((mult_f+1)*n) appears, giving the
+    sign flips conditioned on the parity of mult_f below (n's parity is fixed by
+    the parities of m and n+m).
+    """
     assert len(DX_trans.shape) == 1, 'Data array must be 1D'
     assert len(wave.shape) == 2, 'Output array must be 2D'
 
@@ -190,36 +158,34 @@ def DX_unpack_loop(
     assert Nt > 0
     assert mult_f > 0
 
-    K = mult_f * Nt
-
-    assert DX_trans.shape == (K,)
+    assert DX_trans.shape == (Nt,)
     assert wave.shape == (Nt, Nf)
 
     if m == 0:
         # half of lowest and highest frequency bin pixels are redundant
         # so store them in even and odd components of m=0 respectively
         for n in range(0, Nt, 2):
-            wave[n, 0] = mult_f * DX_trans[n * mult_f].real * np.sqrt(2.0)
+            wave[n, 0] = DX_trans[n].real * np.sqrt(2.0)
     elif m == Nf:
         for n in range(0, Nt, 2):
-            wave[n + 1, 0] = mult_f * DX_trans[n * mult_f].real * np.sqrt(2.0)
+            wave[n + 1, 0] = DX_trans[n].real * np.sqrt(2.0)
     else:
         for n in range(Nt):
             if m % 2:
                 if (n + m) % 2:
-                    wave[n, m] = -mult_f * DX_trans[n * mult_f].imag
+                    wave[n, m] = -DX_trans[n].imag
                 else:
                     if mult_f % 2:
-                        wave[n, m] = mult_f * DX_trans[n * mult_f].real
+                        wave[n, m] = DX_trans[n].real
                     else:
-                        wave[n, m] = -mult_f * DX_trans[n * mult_f].real
+                        wave[n, m] = -DX_trans[n].real
             elif (n + m) % 2:
                 if mult_f % 2:
-                    wave[n, m] = mult_f * DX_trans[n * mult_f].imag
+                    wave[n, m] = DX_trans[n].imag
                 else:
-                    wave[n, m] = -mult_f * DX_trans[n * mult_f].imag
+                    wave[n, m] = -DX_trans[n].imag
             else:
-                wave[n, m] = mult_f * DX_trans[n * mult_f].real
+                wave[n, m] = DX_trans[n].real
 
 
 def transform_wavelet_freq_helper(
@@ -237,7 +203,7 @@ def transform_wavelet_freq_helper(
     assert Nt % 2 == 0
     assert Nf > 0
     assert Nt > 0
-    assert mult_f > 0
+    assert 0 < mult_f <= Nf, 'window must not wrap around the full spectrum'
 
     K = mult_f * Nt
 
@@ -245,29 +211,10 @@ def transform_wavelet_freq_helper(
     assert phif.shape == (K // 2 + 1,)
 
     wave = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
-    wave_alt = np.zeros((Nt, Nf))  # wavelet wavepacket transform of the signal
 
-    DX = np.zeros(K, dtype=complex)
-    # DX_alt = np.zeros(Nt, dtype=complex)
+    DX = np.zeros(Nt, dtype=complex)
     for m in range(Nf + 1):
         DX_assign_loop(m, Nt, Nf, mult_f, DX, data, phif)
-        # DX_assign_loop_old(m, Nt, Nf, 1, DX_alt, data, phif[:Nt//2+1])
-        # import matplotlib.pyplot as plt
-        # plt.plot(np.arange(-K//2, K//2), np.abs(DX))
-        # plt.plot(np.arange(-Nt//2, Nt//2), np.abs(DX_alt))
-        # plt.show()
-        # assert_allclose(DX[K//2:K//2+Nt//2], DX_alt[Nt//2:Nt//2+Nt//2], atol=1.e-100, rtol=1.e-10)
-        # assert_allclose(DX[K//2-Nt//2+1:K//2], DX_alt[1:Nt//2], atol=1.e-100, rtol=1.e-10)
-        DX_trans = fft.ifft(DX, K)
-        # DX_trans_alt = fft.ifft(DX_alt, Nt)
-        # plt.plot(np.linspace(-1., 1., K)[::mult_f], np.imag(DX_trans)[::mult_f]*mult_f)
-        # plt.plot(np.linspace(-1., 1., Nt), np.imag(DX_trans_alt))
-        # plt.show()
+        DX_trans = fft.ifft(DX, Nt)
         DX_unpack_loop(m, Nt, Nf, mult_f, DX_trans, wave)
-        # DX_unpack_loop(m, Nt, Nf, 1, DX_trans_alt, wave_alt)
-        # assert_allclose(wave[:,m]*mult_f, wave_alt[:,m], atol=1.e-2, rtol=1.e-2)
-        # if m == Nf:
-        #    plt.plot(wave[:,0]*mult_f)
-        #    plt.plot(wave_alt[:,0])
-        #    plt.show()
     return wave

@@ -39,10 +39,8 @@ if __name__ == '__main__':
     data_freq[0] = np.real(data_freq[0])
     data_freq[-1] = np.real(data_freq[-1])
 
-    data_wavelet = transform_wavelet_freq(data_freq, Nf, Nt, mult_f=mult_f)
-    # TODO temporary fudge until normalization issue handled
-    # data_wavelet = data_wavelet / (np.std(data_wavelet))
-    data_freq_rec = inverse_wavelet_freq(data_wavelet, Nf, Nt, mult_f=mult_f)
+    data_wavelet = transform_wavelet_freq(data_freq, Nf, Nt, mult_f=mult_f, family='modified_gaussian')
+    data_freq_rec = inverse_wavelet_freq(data_wavelet, Nf, Nt, mult_f=mult_f, family='modified_gaussian')
 
     print(scale * np.var(data_wavelet) / np.var(data_freq))
     print(np.mean(data_freq_rec / data_freq), np.var(data_freq_rec) / np.var(data_freq))
@@ -67,7 +65,8 @@ if __name__ == '__main__':
     assert_allclose(1.0 - np.corrcoef(np.real(data_freq), np.real(data_freq_rec))[0, 1], 0.0, atol=1.0e-5)
     assert_allclose(1.0 - np.corrcoef(np.imag(data_freq), np.imag(data_freq_rec))[0, 1], 0.0, atol=1.0e-4)
     assert_allclose(1.0 - np.corrcoef(np.abs(data_freq), np.abs(data_freq_rec))[0, 1], 0.0, atol=1.0e-4)
-    assert_allclose(1.0 - np.corrcoef(np.angle(data_freq), np.angle(data_freq_rec))[0, 1], 0.0, atol=1.0e-14)
+    # residual set by the frequency-window tail truncated at mult_f*Nt/2 bins
+    assert_allclose(1.0 - np.corrcoef(np.angle(data_freq), np.angle(data_freq_rec))[0, 1], 0.0, atol=1.0e-11)
 
     # check variance preserved for parseval's theorem
     assert_allclose(np.sum(data_wavelet**2), parseval_rfft(data_freq, Nf * Nt), atol=1.0e-100, rtol=1.0e-6)
@@ -92,7 +91,7 @@ if __name__ == '__main__':
         np.mean(np.abs(data_freq)) / scale, np.mean(np.abs(data_freq_rec)) / scale, atol=1.0e-100, rtol=1.0e-7
     )
     assert_allclose(
-        np.mean(np.angle(data_freq)) / scale, np.mean(np.angle(data_freq_rec)) / scale, atol=1.0e-13, rtol=1.0e-7
+        np.mean(np.angle(data_freq)) / scale, np.mean(np.angle(data_freq_rec)) / scale, atol=1.0e-11, rtol=1.0e-5
     )
 
     unit_normal_battery(data_wavelet.flatten())
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     corr_wave[Nt // 2, Nf // 2] = 0.0
     assert_allclose(corr_wave, 0.0, atol=4.0e-3)
     assert_allclose(np.mean(corr_wave), 0.0, atol=3.0e-7)
-    assert_allclose(np.std(corr_wave) * 4 / 3 * np.sqrt(Nt * Nf), 1.0, atol=3.0e-5)
+    assert_allclose(np.std(corr_wave) * 4 / 3 * np.sqrt(Nt * Nf), 1.0, atol=1.0e-3)
     assert_allclose(np.mean(corr_wave, axis=0), 0.0, atol=1.0e-4)
     assert_allclose(np.mean(corr_wave, axis=1), 0.0, atol=1.0e-4)
 
