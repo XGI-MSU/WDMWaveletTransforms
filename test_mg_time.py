@@ -95,8 +95,8 @@ if __name__ == '__main__':
 
     data_time = gen.normal(0.0, 1.0, Nf * Nt)
 
-    data_wavelet = transform_wavelet_time(data_time, Nf, Nt, mult=mult)
-    data_time_rec = inverse_wavelet_time(data_wavelet, Nf, Nt, mult=mult)
+    data_wavelet = transform_wavelet_time(data_time, Nf, Nt, mult=mult, family='modified_gaussian')
+    data_time_rec = inverse_wavelet_time(data_wavelet, Nf, Nt, mult=mult, family='modified_gaussian')
     # check correlation of streams
     assert_allclose(1.0 - np.corrcoef(data_time, data_time_rec)[0, 1], 0.0, atol=1.0e-14)
     # check variance preserved for parseval's theorem
